@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 public class WebSocketController {
     @MessageMapping("/message")
     @SendTo("/topic/messages")
-    public String broadcastMessage(String message) {
-        return message;
+    public Message broadcastMessage(String message) {
+        return new Message(message);
     }
 }
 
