@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    private final GameMap map = new GameMap(20, 20);
+    private final GameMap map = new GameMap(40, 20);
     private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
 
     @Autowired
@@ -90,4 +90,7 @@ public class GameService {
         return wallPositions;
     }
 
+    public GameMap getMap() {
+        return map;
+    }
 }

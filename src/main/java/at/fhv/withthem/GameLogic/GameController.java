@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class GameController {
@@ -60,7 +62,12 @@ public class GameController {
     @MessageMapping("/requestMap")
     public void sendMapLayout() {
         List<Position> wallPositions = gameService.getWallPositions();
-        messagingTemplate.convertAndSend("/topic/mapLayout", wallPositions);
+        Map<String, Object> mapLayout = new HashMap<>();
+        mapLayout.put("wallPositions", wallPositions);
+        mapLayout.put("width", gameService.getMap().getWidth());
+        mapLayout.put("height", gameService.getMap().getHeight());
+
+        messagingTemplate.convertAndSend("/topic/mapLayout", mapLayout);
     }
 
 }
