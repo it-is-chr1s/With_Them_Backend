@@ -35,7 +35,7 @@ public class GameController {
             gameService.registerPlayer(playerName, new Position(0, 0));
         }
 
-        boolean success = gameService.movePlayer(playerName, direction, 0.5f);
+        boolean success = gameService.movePlayer(playerName, direction, 0.01f);
         if (success) {
             Player player = gameService.getPlayer(playerName);
             messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerName, player.getPosition()));
