@@ -1,6 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
 public enum Direction {
+    NONE(0,0),
     NORTH(0, -1),
     SOUTH(0, 1),
     EAST(1, 0),

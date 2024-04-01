@@ -21,6 +21,7 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    /*
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
 
@@ -42,6 +43,19 @@ public class GameController {
         }
     }
 
+     */
+
+    @MessageMapping("/move")
+    public void handleMove(MoveRequest moveRequest) {
+        String playerName = moveRequest.getName();
+        Direction direction = moveRequest.getDirection();
+
+        if (!gameService.playerExists(playerName)) {
+            gameService.registerPlayer(playerName, new Position(0, 0));
+        }
+
+        gameService.updatePlayerDirection(playerName, direction);
+    }
     @MessageMapping("/requestMap")
     public void sendMapLayout() {
         List<Position> wallPositions = gameService.getWallPositions();

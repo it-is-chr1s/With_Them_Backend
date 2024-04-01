@@ -1,5 +1,8 @@
 package at.fhv.withthem.GameLogic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,6 +13,32 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameService {
     private final GameMap map = new GameMap(20, 20);
     private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    public synchronized void updatePlayerDirection(String playerId, Direction direction) {
+        Player player = players.get(playerId);
+        if (player != null) {
+            player.setDirection(direction);
+        }
+    }
+
+    @Scheduled(fixedRate = 2)
+    public void gameLoop() {
+        players.forEach((id, player) -> {
+            Position currentPosition = player.getPosition();
+            Direction direction = player.getDirection();
+            float speed = 0.01f;
+
+            Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+
+            if (canMoveTo(newPosition)) {
+                player.setPosition(newPosition);
+                messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+            }
+        });
+    }
 
     public synchronized boolean movePlayer(String playerId, Direction direction, float speed) {
         Player player = players.get(playerId);
