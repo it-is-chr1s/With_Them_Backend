@@ -1,5 +1,7 @@
 package at.fhv.withthem.GameLogic.tasks.task;
 
+import at.fhv.withthem.GameLogic.tasks.TaskMessage;
+
 public class TaskFileDownloadUpload extends Task{
     private final float speed = 1.0f;
     private final int downloadPosition_x = 5;
@@ -9,6 +11,10 @@ public class TaskFileDownloadUpload extends Task{
     private final int uploadPosition_y = 10;
 
     private int counter = 0;
+
+    public TaskFileDownloadUpload() {
+        super("TaskFileDownloadUpload");
+    }
 
     @Override
     public int playerAction(TaskMessage msg){
@@ -26,5 +32,10 @@ public class TaskFileDownloadUpload extends Task{
         }
 
         return counter;
+    }
+
+    @Override
+    public TaskMessage getCurrentState(){
+        return new OutgoingFileDownloadUploadMessage((counter == 0) ? "Download" : "Upload");
     }
 }

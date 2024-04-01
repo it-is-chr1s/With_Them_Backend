@@ -2,16 +2,20 @@ package at.fhv.withthem.GameLogic.tasks;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class StartTaskMessage {
+public class TaskMessage {
     private String _lobby;
     private String _task;
     private String _player;
 
     @JsonCreator
-    public StartTaskMessage(String lobby, String task, String player) {
+    public TaskMessage(String lobby, String task, String player) {
         _lobby = lobby;
         _task = task;
         _player = player;
+    }
+
+    public TaskMessage(String task) {
+        _task = task;
     }
 
     public String getLobby() {

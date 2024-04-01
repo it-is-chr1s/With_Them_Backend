@@ -1,6 +1,5 @@
 package at.fhv.withthem.GameLogic.tasks;
 
-import at.fhv.withthem.GameLogic.tasks.task.TaskMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -10,27 +9,28 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class TasksController {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SimpMessagingTemplate _messagingTemplate;
+
+    private final TasksHandler _tasksHandler;
 
     @Autowired
-    public TasksController(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
+    public TasksController(SimpMessagingTemplate messagingTemplate, TasksHandler tasksHandler) {
+        _messagingTemplate = messagingTemplate;
+        _tasksHandler = tasksHandler;
     }
     @MessageMapping("/startTask")
-    public void startTask(StartTaskMessage startTaskMessage){
-        System.out.println("Task started" + startTaskMessage.getTask() + " " + startTaskMessage.getLobby());
-        //messagingTemplate.convertAndSend("/topic/task", "Task started");
+    public void startTask(TaskMessage taskMessage){
+        _tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getTask(), taskMessage.getPlayer());
     }
 
     @MessageMapping("/playerAction")
     public void playerAction(TaskMessage taskMessage){
-
+        _tasksHandler.playerAction(taskMessage);
     }
 
     @MessageMapping("/availableTasks")
     public void getAvailableTasks(@Payload String lobbyID){
-        System.out.println("Available tasks requested for lobby: " + lobbyID);
-        //messagingTemplate.convertAndSend("/topic/availableTasks", "Available tasks requested");
+        System.out.println("Available tasks requested for lobby: " + _tasksHandler.getAvailableTasks(lobbyID).toString());
     }
 
     //publish available tasks to the lobby
