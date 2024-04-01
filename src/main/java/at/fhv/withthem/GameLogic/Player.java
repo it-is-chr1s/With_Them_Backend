@@ -5,6 +5,7 @@ public class Player {
     private String _id;
     private Position _position;
     private Direction _direction;
+    private boolean _hasMoved = false;
     public Player(String id, Position position) {
         this._id = id;
         this._position = position;
@@ -33,5 +34,13 @@ public class Player {
 
     public void setDirection(Direction direction) {
         _direction = direction;
+    }
+
+    public boolean hasMoved() {
+        return _hasMoved;
+    }
+
+    public void setHasMoved(boolean hasMoved) {
+        this._hasMoved = hasMoved;
     }
 }

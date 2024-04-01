@@ -22,6 +22,7 @@ public class GameController {
     }
 
     /*
+
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
 
@@ -43,8 +44,8 @@ public class GameController {
         }
     }
 
-     */
 
+    */
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
         String playerName = moveRequest.getName();

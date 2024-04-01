@@ -21,21 +21,24 @@ public class GameService {
         Player player = players.get(playerId);
         if (player != null) {
             player.setDirection(direction);
+            player.setHasMoved(!direction.equals(Direction.NONE));
         }
     }
 
-    @Scheduled(fixedRate = 2)
+    @Scheduled(fixedRate = 1)
     public void gameLoop() {
         players.forEach((id, player) -> {
-            Position currentPosition = player.getPosition();
-            Direction direction = player.getDirection();
-            float speed = 0.01f;
+            if (player.hasMoved()) {
+                Position currentPosition = player.getPosition();
+                Direction direction = player.getDirection();
+                float speed = 0.01f;
 
-            Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+                Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-            if (canMoveTo(newPosition)) {
-                player.setPosition(newPosition);
-                messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+                if (canMoveTo(newPosition)) {
+                    player.setPosition(newPosition);
+                    messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+                }
             }
         });
     }
