@@ -16,8 +16,8 @@ public class TasksController {
         this.messagingTemplate = messagingTemplate;
     }
     @MessageMapping("/startTask")
-    public void startTask(StartTaskRequest startTaskRequest){
-        System.out.println("Task started" + startTaskRequest.getTask() + " " + startTaskRequest.getLobby());
+    public void startTask(StartTaskMessage startTaskMessage){
+        System.out.println("Task started" + startTaskMessage.getTask() + " " + startTaskMessage.getLobby());
         //messagingTemplate.convertAndSend("/topic/task", "Task started");
     }
 
