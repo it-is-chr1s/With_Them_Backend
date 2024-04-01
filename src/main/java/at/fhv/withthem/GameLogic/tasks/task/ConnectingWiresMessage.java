@@ -1,6 +1,6 @@
 package at.fhv.withthem.GameLogic.tasks.task;
 
-public class ConnectingWiresMessage {
+public class ConnectingWiresMessage extends TaskMessage {
     private int _wire1;
     private int _wire2;
 

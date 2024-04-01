@@ -1,5 +1,6 @@
 package at.fhv.withthem.GameLogic.tasks;
 
+import at.fhv.withthem.GameLogic.tasks.task.TaskMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -19,6 +20,11 @@ public class TasksController {
     public void startTask(StartTaskMessage startTaskMessage){
         System.out.println("Task started" + startTaskMessage.getTask() + " " + startTaskMessage.getLobby());
         //messagingTemplate.convertAndSend("/topic/task", "Task started");
+    }
+
+    @MessageMapping("/playerAction")
+    public void playerAction(TaskMessage taskMessage){
+
     }
 
     @MessageMapping("/availableTasks")

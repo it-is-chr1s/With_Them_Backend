@@ -2,8 +2,7 @@ package at.fhv.withthem.GameLogic.tasks.task;
 
 import java.util.Random;
 
-public class TaskConnectingWires {
-    private String _player;
+public class TaskConnectingWires extends Task{
     private final int _amountOfWires = 4;
     private final int[][] _wires;
     private int counter = 0;
@@ -13,19 +12,17 @@ public class TaskConnectingWires {
         createWires();
         shuffleWires();
     }
-    public void setPlayer(String player) {
-        if(_player == null)
-            _player = player;
-    }
 
-    public boolean playerAction(ConnectingWiresMessage msg){
-        if(_wires[msg.getWire1()][1] == msg.getWire2()){
+    @Override
+    public int playerAction(TaskMessage msg){
+        ConnectingWiresMessage msg_cw = (ConnectingWiresMessage) msg;
+        if(_wires[msg_cw.getWire1()][1] == msg_cw.getWire2()){
             counter++;
         }else{
             counter = 0;
         }
 
-        return counter == _amountOfWires;
+        return counter;
     }
 
     private void createWires(){
