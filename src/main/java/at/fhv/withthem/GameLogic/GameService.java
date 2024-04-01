@@ -2,6 +2,8 @@ package at.fhv.withthem.GameLogic;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -42,6 +44,18 @@ public class GameService {
 
     public void registerPlayer(String playerId, Position startPosition) {
         players.put(playerId, new Player(playerId, startPosition));
+    }
+
+    public List<Position> getWallPositions() {
+        List<Position> wallPositions = new ArrayList<>();
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isWall(x, y)) {
+                    wallPositions.add(new Position(x, y));
+                }
+            }
+        }
+        return wallPositions;
     }
 
 }
