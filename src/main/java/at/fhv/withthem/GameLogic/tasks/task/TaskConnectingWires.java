@@ -7,7 +7,7 @@ import java.util.Random;
 public class TaskConnectingWires extends Task{
     private final int _amountOfWires = 4;
     private final short[][] _wires;
-    private int counter = 0;
+    private int _counter = 0;
 
     public TaskConnectingWires() {
         super("TaskConnectingWires");
@@ -17,20 +17,23 @@ public class TaskConnectingWires extends Task{
     }
 
     @Override
-    public int playerAction(TaskMessage msg){
+    public void playerAction(TaskMessage msg, TaskCompletedListener listener){
         IncomingConnectingWiresMessage msg_cw = (IncomingConnectingWiresMessage) msg;
         if(_wires[msg_cw.getWire1()][1] == msg_cw.getWire2()){
-            counter++;
+            _counter++;
         }else{
-            counter = 0;
+            _counter = 0;
         }
 
-        return counter;
+        if(_counter == _amountOfWires){
+            listener.taskCompleted();
+        }
+
     }
 
     @Override
     public TaskMessage getCurrentState(){
-        return new OutgoingConnectingWiresMessage(_wires);
+        return new OutgoingConnectingWiresMessage(_wires, _counter);
     }
 
     private void createWires(){

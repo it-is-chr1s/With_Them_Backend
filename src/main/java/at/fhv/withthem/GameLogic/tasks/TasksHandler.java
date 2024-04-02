@@ -1,5 +1,6 @@
 package at.fhv.withthem.GameLogic.tasks;
 
+import at.fhv.withthem.GameLogic.tasks.task.TaskCompletedListener;
 import at.fhv.withthem.GameLogic.tasks.task.TaskConnectingWires;
 import at.fhv.withthem.GameLogic.tasks.task.TaskFileDownloadUpload;
 import org.springframework.stereotype.Component;
@@ -12,13 +13,13 @@ import at.fhv.withthem.GameLogic.tasks.task.Task;
 
 @Component
 public class TasksHandler {
-    private List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
+    private final List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
             new TaskConnectingWires(),
             new TaskFileDownloadUpload()
     ));
-    private HashMap<String, List<Task>> _availableTasks = new HashMap<>();
-    private HashMap<String, List<Task>> _activeTasks = new HashMap<>();
-    private HashMap<String, Integer> _finishedTasks = new HashMap<>();
+    private final HashMap<String, List<Task>> _availableTasks = new HashMap<>();
+    private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
+    private final HashMap<String, Integer> _finishedTasks = new HashMap<>();
 
     public void loadLobby(String lobby){
         _availableTasks.put(lobby, new ArrayList<>(_possibleTasks));
@@ -37,14 +38,18 @@ public class TasksHandler {
         }
     }
 
-    public int playerAction(TaskMessage taskMessage) {
+    public void playerAction(TaskMessage taskMessage) {
         for(Task task : _activeTasks.get(taskMessage.getLobby())) {
             if(task.getPlayer().equals(taskMessage.getPlayer())){
-                return task.playerAction(taskMessage);
+                task.playerAction(taskMessage, new TaskCompletedListener(){
+                    @Override
+                    public void taskCompleted() {
+                        finishTask(taskMessage.getLobby(), taskMessage.getTask(), taskMessage.getPlayer());
+                    }
+                });
+                break;
             }
         }
-
-        return -1;
     }
 
     public TaskMessage getCurrentState(String lobby, String player){
@@ -60,7 +65,7 @@ public class TasksHandler {
         return null;
     }
 
-    public void finishTask(String lobby, String task, String player){
+    private void finishTask(String lobby, String task, String player){
         for(Task taskObj : _activeTasks.get(lobby)){
             if(taskObj.getType().equals(task) && taskObj.getPlayer().equals(player)){
                 _activeTasks.get(lobby).remove(taskObj);
@@ -88,5 +93,9 @@ public class TasksHandler {
         }
 
         return availableTasks;
+    }
+
+    public int getFinishedTasks(String lobby){
+        return _finishedTasks.get(lobby);
     }
 }

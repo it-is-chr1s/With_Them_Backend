@@ -17,7 +17,7 @@ public class TaskFileDownloadUpload extends Task{
     }
 
     @Override
-    public int playerAction(TaskMessage msg){
+    public void playerAction(TaskMessage msg, TaskCompletedListener listener){
         //FileDownloadUpload msg_fdu = (FileDownloadUpload) msg;
         if(true){ //player is at downloadPosition
             if(counter == 0){
@@ -30,8 +30,6 @@ public class TaskFileDownloadUpload extends Task{
             }
             //upload file
         }
-
-        return counter;
     }
 
     @Override

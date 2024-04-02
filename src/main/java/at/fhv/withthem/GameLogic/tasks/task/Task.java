@@ -23,7 +23,7 @@ public abstract class Task {
         return _player;
     }
 
-    public abstract int playerAction(TaskMessage msg);
+    public abstract void playerAction(TaskMessage msg, TaskCompletedListener listener);
 
     public abstract TaskMessage getCurrentState();
 
