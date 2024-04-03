@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(classes = TasksApplication.class)
-public class TasksApplicationTests {
+public class TaskConnectingWiresApplicationTests {
 
     @Autowired
     private TasksHandler tasksHandler;
@@ -35,24 +35,26 @@ public class TasksApplicationTests {
 
     @Test
     //compares available tasks before and after starting a task
-    void StartTask() {
+    void StartTaskTaskConnectingWires() {
         tasksHandler.loadLobby("TestLobby");
 
         List<String> availableTasks = tasksHandler.getAvailableTasks("TestLobby");
         int sizeBefore = availableTasks.size();
+        System.out.println("Available tasks before starting TaskFileDownloadUpload: " + availableTasks);
 
         tasksHandler.startTask("TestLobby", "TaskConnectingWires", "TestPlayer");
 
         availableTasks = tasksHandler.getAvailableTasks("TestLobby");
         int sizeAfter = availableTasks.size();
 
+        System.out.println("Available tasks after starting TaskFileDownloadUpload: " + availableTasks);
         Assertions.assertFalse(availableTasks.contains("TaskConnectingWires"));
         Assertions.assertEquals(sizeBefore - 1, sizeAfter);
     }
 
     @Test
     //compares counter change before and after action
-    void PlayerAction() throws JsonProcessingException {
+    void PlayerActionConnectingWires() throws JsonProcessingException {
         tasksHandler.loadLobby("TestLobby");
         tasksHandler.startTask("TestLobby", "TaskConnectingWires", "TestPlayer");
 
@@ -74,7 +76,7 @@ public class TasksApplicationTests {
 
     @Test
     //tests if task is finished after all wires are connected
-    void TaskCompleted(){
+    void TaskCompletedConnectingWires(){
         System.out.println("Wire 0 was already connected in playerAction() -> Finished tasks: " + tasksHandler.getFinishedTasks("TestLobby"));
 
         for(int i = 1; i < 4; i++){
@@ -88,7 +90,7 @@ public class TasksApplicationTests {
     }
 
     @Test
-    void cancelTask(){
+    void cancelTaskConnectingWires(){
         tasksHandler.startTask("TestLobby", "TaskFileDownloadUpload", "TestPlayer");
 
         List<String> availableTasks = tasksHandler.getAvailableTasks("TestLobby");

@@ -18,22 +18,21 @@ public class TaskFileDownloadUpload extends Task{
 
     @Override
     public void playerAction(TaskMessage msg, TaskCompletedListener listener){
-        //FileDownloadUpload msg_fdu = (FileDownloadUpload) msg;
-        if(true){ //player is at downloadPosition
+        IncomingFileDownloadUploadMessage msg_fdu = (IncomingFileDownloadUploadMessage) msg;
+        if(msg_fdu.getMake().equals("download")){ //player is at downloadPosition
             if(counter == 0){
                 counter++;
             }
-            //download file
-        }else{
+        }else if(msg_fdu.getMake().equals("upload")){
             if(counter == 1){
                 counter++;
+                listener.taskCompleted();
             }
-            //upload file
         }
     }
 
     @Override
     public TaskMessage getCurrentState(){
-        return new OutgoingFileDownloadUploadMessage((counter == 0) ? "Download" : "Upload");
+        return new OutgoingFileDownloadUploadMessage((counter == 0) ? "readyForDownload" : (counter == 1) ? "readyForUpload" : "completed");
     }
 }
