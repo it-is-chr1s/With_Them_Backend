@@ -18,9 +18,15 @@ public class TasksController {
         _messagingTemplate = messagingTemplate;
         _tasksHandler = tasksHandler;
     }
+
+    @MessageMapping
+    public void loadLobby(@Payload String lobbyID){
+        _tasksHandler.loadLobby(lobbyID);
+    }
     @MessageMapping("/startTask")
     public void startTask(TaskMessage taskMessage){
         _tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getTask(), taskMessage.getPlayer());
+        //sendBack to player current status
     }
 
     @MessageMapping("/playerAction")
