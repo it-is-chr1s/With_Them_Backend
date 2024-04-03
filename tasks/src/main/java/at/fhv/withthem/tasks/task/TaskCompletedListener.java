@@ -1,4 +1,4 @@
-package at.fhv.withthem.GameLogic.tasks.task;
+package at.fhv.withthem.tasks.task;
 
 public interface TaskCompletedListener {
     void taskCompleted();

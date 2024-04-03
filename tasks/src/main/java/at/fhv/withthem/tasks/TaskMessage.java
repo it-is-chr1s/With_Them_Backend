@@ -1,4 +1,4 @@
-package at.fhv.withthem.GameLogic.tasks;
+package at.fhv.withthem.tasks;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

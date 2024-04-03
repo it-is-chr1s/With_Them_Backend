@@ -11,9 +11,13 @@
 	<groupId>at.fhv</groupId>
 	<artifactId>withthem</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>withthem</name>
+    <packaging>pom</packaging>
+    <name>withthem</name>
 	<description>With Them Game Backend</description>
-	<properties>
+    <modules>
+        <module>tasks</module>
+    </modules>
+    <properties>
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>

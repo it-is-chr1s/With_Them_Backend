@@ -1,15 +1,15 @@
-package at.fhv.withthem.GameLogic.tasks;
+package at.fhv.withthem.tasks;
 
-import at.fhv.withthem.GameLogic.tasks.task.TaskCompletedListener;
-import at.fhv.withthem.GameLogic.tasks.task.TaskConnectingWires;
-import at.fhv.withthem.GameLogic.tasks.task.TaskFileDownloadUpload;
+import at.fhv.withthem.tasks.task.TaskCompletedListener;
+import at.fhv.withthem.tasks.task.TaskConnectingWires;
+import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
+import at.fhv.withthem.tasks.task.Task;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import at.fhv.withthem.GameLogic.tasks.task.Task;
 
 @Component
 public class TasksHandler {

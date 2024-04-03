@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @SpringBootApplication
 @Configuration
-@ComponentScan({"at.fhv.withthem.GameLogic.tasks", "at.fhv.withthem.WebSocket"})
+@ComponentScan({"at.fhv.withthem.tasks", "at.fhv.withthem.WebSocket"})
 public class TasksApplication {
 
     public static void main(String[] args) {

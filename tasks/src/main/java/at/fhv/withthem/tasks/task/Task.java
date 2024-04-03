@@ -1,6 +1,6 @@
-package at.fhv.withthem.GameLogic.tasks.task;
+package at.fhv.withthem.tasks.task;
 
-import at.fhv.withthem.GameLogic.tasks.TaskMessage;
+import at.fhv.withthem.tasks.TaskMessage;
 
 public abstract class Task {
     private String _player;

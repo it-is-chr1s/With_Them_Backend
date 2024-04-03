@@ -1,4 +1,4 @@
-package at.fhv.withthem.GameLogic.tasks;
+package at.fhv.withthem.tasks;
 
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;

@@ -1,6 +1,6 @@
-package at.fhv.withthem.GameLogic.tasks.task;
+package at.fhv.withthem.tasks.task;
 
-import at.fhv.withthem.GameLogic.tasks.TaskMessage;
+import at.fhv.withthem.tasks.TaskMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class IncomingFileDownloadUploadMessage extends TaskMessage {

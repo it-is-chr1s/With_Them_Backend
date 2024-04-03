@@ -1,9 +1,8 @@
-package at.fhv.withthem;
+package at.fhv.withthem.tasks;
 
-import at.fhv.withthem.GameLogic.tasks.TaskMessage;
-import at.fhv.withthem.GameLogic.tasks.TasksHandler;
-import at.fhv.withthem.GameLogic.tasks.task.IncomingConnectingWiresMessage;
-import at.fhv.withthem.GameLogic.tasks.task.OutgoingConnectingWiresMessage;
+import at.fhv.withthem.TasksApplication;
+import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
+import at.fhv.withthem.tasks.task.OutgoingConnectingWiresMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;

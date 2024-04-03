@@ -1,4 +1,4 @@
-package at.fhv.withthem.GameLogic.tasks;
+package at.fhv.withthem.tasks;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
