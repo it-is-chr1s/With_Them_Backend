@@ -57,7 +57,8 @@ public class GameService {
     }
 
     private boolean canMoveTo(Position position) {
-        return map.isWithinBounds((int)position.getX(), (int)position.getY()) && !map.isWall((int)position.getX(), (int)position.getY());
+        return map.isWithinBounds((int)position.getX(), (int)position.getY())
+                && !map.isWall((int)position.getX(), (int)position.getY());
     }
 
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
@@ -88,6 +89,18 @@ public class GameService {
             }
         }
         return wallPositions;
+    }
+
+    public List<TaskPosition> getTaskPositions(){
+        List<TaskPosition> taskPositions = new ArrayList<>();
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isTask(x, y)) {
+                    taskPositions.add(new TaskPosition(x, y, map.getContent(x, y)));
+                }
+            }
+        }
+        return taskPositions;
     }
 
     public GameMap getMap() {

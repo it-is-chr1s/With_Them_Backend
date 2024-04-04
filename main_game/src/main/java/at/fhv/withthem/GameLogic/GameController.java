@@ -62,8 +62,10 @@ public class GameController {
     @MessageMapping("/requestMap")
     public void sendMapLayout() {
         List<Position> wallPositions = gameService.getWallPositions();
+        List<TaskPosition> taskPositions = gameService.getTaskPositions();
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
+        mapLayout.put("taskPositions", taskPositions);
         mapLayout.put("width", gameService.getMap().getWidth());
         mapLayout.put("height", gameService.getMap().getHeight());
 
