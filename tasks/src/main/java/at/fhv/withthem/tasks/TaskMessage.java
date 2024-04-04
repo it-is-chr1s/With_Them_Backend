@@ -6,12 +6,18 @@ public class TaskMessage {
     private String _lobby;
     private String _task;
     private String _player;
+    private int _id;
 
     @JsonCreator
     public TaskMessage(String lobby, String task, String player) {
         _lobby = lobby;
         _task = task;
         _player = player;
+    }
+
+    public TaskMessage(String task, int id){
+        _task = task;
+        _id = id;
     }
 
     public TaskMessage(String task) {
@@ -40,5 +46,9 @@ public class TaskMessage {
 
     public void setPlayer(String _player) {
         this._player = _player;
+    }
+
+    public int getId(){
+        return _id;
     }
 }

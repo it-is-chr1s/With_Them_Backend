@@ -11,11 +11,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    private final GameMap map = new GameMap(40, 20);
+    @Autowired
+    private final GameMap map;
     private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    public GameService(GameMap map) {
+        this.map = map;
+    }
 
     public synchronized void updatePlayerDirection(String playerId, Direction direction) {
         Player player = players.get(playerId);
@@ -38,6 +43,8 @@ public class GameService {
                 if (canMoveTo(newPosition)) {
                     player.setPosition(newPosition);
                     messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+
+                    messagingTemplate.convertAndSend("/topic/player/" + id + "/controlsEnabled/task", canDoTask(player.getPosition()));
                 }
             }
         });
@@ -59,6 +66,10 @@ public class GameService {
     private boolean canMoveTo(Position position) {
         return map.isWithinBounds((int)position.getX(), (int)position.getY())
                 && !map.isWall((int)position.getX(), (int)position.getY());
+    }
+
+    private boolean canDoTask(Position position){
+        return map.isTask((int)position.getX(), (int)position.getY());
     }
 
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {

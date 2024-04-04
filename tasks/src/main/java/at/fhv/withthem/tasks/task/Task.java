@@ -5,6 +5,7 @@ import at.fhv.withthem.tasks.TaskMessage;
 public abstract class Task {
     private String _player;
     private String _type;
+    private int _id;
 
     public Task(String type) {
         _type = type;
@@ -17,6 +18,14 @@ public abstract class Task {
     public void setPlayer(String player) {
         if(_player == null)
             _player = player;
+    }
+
+    public void setId(int id) {
+        _id = id;
+    }
+
+    public int getId(){
+        return _id;
     }
 
     public String getPlayer(){

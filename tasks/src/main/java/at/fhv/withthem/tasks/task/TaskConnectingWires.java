@@ -10,7 +10,7 @@ public class TaskConnectingWires extends Task{
     private int _counter = 0;
 
     public TaskConnectingWires() {
-        super("TaskConnectingWires");
+        super("Connecting Wires");
         _wires = new short[_amountOfWires][2];
         createWires();
         shuffleWires();

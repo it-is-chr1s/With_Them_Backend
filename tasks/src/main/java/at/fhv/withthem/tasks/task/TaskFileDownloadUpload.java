@@ -13,7 +13,7 @@ public class TaskFileDownloadUpload extends Task{
     private int counter = 0;
 
     public TaskFileDownloadUpload() {
-        super("TaskFileDownloadUpload");
+        super("FileDownloadUpload");
     }
 
     @Override
@@ -34,5 +34,16 @@ public class TaskFileDownloadUpload extends Task{
     @Override
     public TaskMessage getCurrentState(){
         return new OutgoingFileDownloadUploadMessage((counter == 0) ? "readyForDownload" : (counter == 1) ? "readyForUpload" : "completed");
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof Task task){
+            return task.getType().equals(this.getType());
+        }else if(obj instanceof String type){
+            return type.equals("File Download") || type.equals("File Upload");
+        }
+
+        return false;
     }
 }

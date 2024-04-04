@@ -2,10 +2,13 @@ package at.fhv.withthem.GameLogic;
 
 public class TaskPosition extends Position{
     private String _taskType;
+    private int _id;
 
-    public TaskPosition(float x, float y, String taskType) {
+    public TaskPosition(float x, float y, String taskTypeWithId) {
         super(x, y);
-        _taskType = taskType;
+        String[] taskTypeAndId = taskTypeWithId.split("%id");
+        _taskType = taskTypeAndId[0];
+        _id = Integer.parseInt(taskTypeAndId[1]);
     }
 
     public String getTaskType() {
@@ -14,5 +17,9 @@ public class TaskPosition extends Position{
 
     public void setTaskType(String taskType) {
         _taskType = taskType;
+    }
+
+    public int getId() {
+        return _id;
     }
 }

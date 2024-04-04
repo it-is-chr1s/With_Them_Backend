@@ -4,6 +4,8 @@ import at.fhv.withthem.tasks.task.TaskCompletedListener;
 import at.fhv.withthem.tasks.task.TaskConnectingWires;
 import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,10 +23,20 @@ public class TasksHandler {
     private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
     private final HashMap<String, Integer> _finishedTasks = new HashMap<>();
 
-    public void loadLobby(String lobby){
-        _availableTasks.put(lobby, new ArrayList<>(_possibleTasks));
-        _activeTasks.put(lobby, new ArrayList<>());
-        _finishedTasks.put(lobby, 0);
+    public void addTaskToLobby(String lobby, String taskType, int taskID){
+        if(_availableTasks.get(lobby) == null) {
+            _availableTasks.put(lobby, new ArrayList<>());
+            _activeTasks.put(lobby, new ArrayList<>());
+            _finishedTasks.put(lobby, 0);
+        }
+
+        for(Task possibleTask : _possibleTasks){
+            if(possibleTask.equals(taskType) && _availableTasks.get(lobby).stream().noneMatch(task -> task.getId() == taskID)){
+                possibleTask.setId(taskID);
+                _availableTasks.get(lobby).add(possibleTask);
+                break;
+            }
+        }
     }
 
     public void startTask(String lobby, String task, String player){
@@ -85,11 +97,11 @@ public class TasksHandler {
         }
     }
 
-    public List<String> getAvailableTasks(String lobby){
-        List<String> availableTasks = new ArrayList<>();
+    public List<TaskMessage> getAvailableTasks(String lobby){
+        List<TaskMessage> availableTasks = new ArrayList<>();
 
         for(Task task : _availableTasks.get(lobby)){
-            availableTasks.add(task.getType());
+            availableTasks.add(new TaskMessage(task.getType(), task.getId()));
         }
 
         return availableTasks;

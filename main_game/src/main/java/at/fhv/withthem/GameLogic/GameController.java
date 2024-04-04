@@ -1,12 +1,20 @@
 package at.fhv.withthem.GameLogic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +78,24 @@ public class GameController {
         mapLayout.put("height", gameService.getMap().getHeight());
 
         messagingTemplate.convertAndSend("/topic/mapLayout", mapLayout);
+    }
+
+    public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) throws JsonProcessingException {
+        List<InitTaskMessage> initTaskMessages = new ArrayList<>();
+        for (TaskPosition taskPosition : taskPositions) {
+            initTaskMessages.add(new InitTaskMessage(lobbyID, taskPosition.getTaskType(), taskPosition.getId()));
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(mapper.writeValueAsString(initTaskMessages));
+        //messagingTemplate.convertAndSend("/tasks/loadAvailableTasks", initTaskMessages);
+
+        String url = "http://localhost:4001/loadAvailableTasks";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<List<InitTaskMessage>> requestEntity = new HttpEntity<>(initTaskMessages, headers);
+        restTemplate.postForEntity(url, requestEntity, String.class);
     }
 
 }

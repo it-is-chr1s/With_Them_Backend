@@ -1,19 +1,19 @@
 package at.fhv.withthem.GameLogic;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class GameMap {
     private final String[][] _grid;
-    private final int _height;
-    private final int _width;
+    private final int _height = 20;
+    private final int _width = 40;
+    public GameMap() {
+        this._grid = new String[_height][_width];
 
-    public GameMap(int width, int height) {
-        this._grid = new String[height][width];
-        this._height = height;
-        this._width = width;
-
-        initializeMapLayout();
+        //initializeMapLayout();
     }
 
-    private void initializeMapLayout() {
+    public void initializeMapLayout() {
         setWall(5, 6);
         setWall(5, 5);
         setWall(6, 5);
@@ -30,13 +30,14 @@ public class GameMap {
         setWall(5, 9);
         setWall(5, 8);
 
-        setTask(7, 7, "Connecting Wires");
-        setTask(11, 5, "File Download");
-        setTask(11, 9, "File Upload");
+        //type should not include String %id
+        setTask(7, 7, "Connecting Wires", 1);
+        setTask(11, 5, "File Download", 2);
+        setTask(11, 9, "File Upload", 2);
     }
 
-    public void setTask(int x, int y, String type){
-        _grid[y][x] = type;
+    public void setTask(int x, int y, String type, int id){
+        _grid[y][x] = type + "%id" + id;
     }
 
     public boolean isTask(int x, int y){
