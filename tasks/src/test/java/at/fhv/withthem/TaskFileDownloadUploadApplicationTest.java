@@ -1,6 +1,8 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem;
 
 import at.fhv.withthem.TasksApplication;
+import at.fhv.withthem.tasks.TaskMessage;
+import at.fhv.withthem.tasks.TasksHandler;
 import at.fhv.withthem.tasks.task.IncomingFileDownloadUploadMessage;
 import at.fhv.withthem.tasks.task.OutgoingFileDownloadUploadMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;

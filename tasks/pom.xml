@@ -6,8 +6,7 @@
         <artifactId>withthem</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>org.example</groupId>
+
     <artifactId>tasks</artifactId>
-    <name>Archetype - tasks</name>
-    <url>http://maven.apache.org</url>
+    <name>Tasks</name>
 </project>

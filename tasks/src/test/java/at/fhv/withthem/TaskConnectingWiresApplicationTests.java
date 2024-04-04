@@ -1,6 +1,8 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem;
 
 import at.fhv.withthem.TasksApplication;
+import at.fhv.withthem.tasks.TaskMessage;
+import at.fhv.withthem.tasks.TasksHandler;
 import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
 import at.fhv.withthem.tasks.task.OutgoingConnectingWiresMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -16,7 +16,8 @@
 	<description>With Them Game Backend</description>
     <modules>
         <module>tasks</module>
-    </modules>
+		<module>main_game</module>
+	</modules>
     <properties>
 		<java.version>17</java.version>
 	</properties>
