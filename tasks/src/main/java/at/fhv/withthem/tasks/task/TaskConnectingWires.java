@@ -7,19 +7,19 @@ import java.util.Random;
 public class TaskConnectingWires extends Task{
     private final int _amountOfWires = 4;
     private final short[][] _plugs;
-    private final short[][] _connectedPlugs;
+    private final boolean[] _connectedPlugs;
 
     public TaskConnectingWires() {
         super("Connecting Wires");
         _plugs = new short[_amountOfWires][2];
-        _connectedPlugs = new short[_amountOfWires][2];
+        _connectedPlugs = new boolean[_amountOfWires];
         resetConnectedPlugs();
         createPlugs();
         shufflePlugs();
     }
 
     @Override
-    public void playerAction(TaskMessage msg, TaskCompletedListener listener){
+    public void playerAction(TaskMessage msg){
         IncomingConnectingWiresMessage msg_cw = (IncomingConnectingWiresMessage) msg;
         System.out.print("Plug1: " + msg_cw.getPlug1() + " Plug2: " + msg_cw.getPlug2() + "\n");
         if(msg_cw.getPlug2() == msg_cw.getPlug1()){
@@ -27,17 +27,18 @@ public class TaskConnectingWires extends Task{
             while(_plugs[pos][1] != msg_cw.getPlug1()){
                 pos++;
             }
-            _connectedPlugs[pos][1] = _plugs[pos][1];
+            _connectedPlugs[pos] = true;
             System.out.println("Correct");
         }else{
             resetConnectedPlugs();
             System.out.println("Wrong");
         }
+    }
 
-        if(allPlugsConnected()){
-            listener.taskCompleted();
-        }
-
+    @Override
+    public void reset(){
+        resetConnectedPlugs();
+        shufflePlugs();
     }
 
     @Override
@@ -45,9 +46,10 @@ public class TaskConnectingWires extends Task{
         return new OutgoingConnectingWiresMessage(_plugs, _connectedPlugs);
     }
 
-    private boolean allPlugsConnected(){
+    @Override
+    public boolean taskCompleted(){
         for(short i = 0; i < _amountOfWires; i++) {
-            if(_connectedPlugs[i][1] == -1){
+            if(!_connectedPlugs[i]){
                 return false;
             }
         }
@@ -56,8 +58,7 @@ public class TaskConnectingWires extends Task{
 
     private void resetConnectedPlugs(){
         for(short i = 0; i < _amountOfWires; i++) {
-            _connectedPlugs[i][0] = i;
-            _connectedPlugs[i][1] = -1;
+            _connectedPlugs[i] = false;
         }
     }
 

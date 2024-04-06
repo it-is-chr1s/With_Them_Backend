@@ -17,7 +17,7 @@ public class TaskFileDownloadUpload extends Task{
     }
 
     @Override
-    public void playerAction(TaskMessage msg, TaskCompletedListener listener){
+    public void playerAction(TaskMessage msg){
         IncomingFileDownloadUploadMessage msg_fdu = (IncomingFileDownloadUploadMessage) msg;
         if(msg_fdu.getMake().equals("download")){ //player is at downloadPosition
             if(counter == 0){
@@ -26,9 +26,18 @@ public class TaskFileDownloadUpload extends Task{
         }else if(msg_fdu.getMake().equals("upload")){
             if(counter == 1){
                 counter++;
-                listener.taskCompleted();
             }
         }
+    }
+
+    @Override
+    public void reset(){
+        counter = 0;
+    }
+
+    @Override
+    public boolean taskCompleted(){
+        return counter == 2;
     }
 
     @Override

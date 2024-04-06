@@ -83,9 +83,20 @@ public class TasksController {
         System.out.println("Available tasks requested for lobby: " + _tasksHandler.getAvailableTasks(lobbyID).toString());
     }
 
-    @MessageMapping("tasks/cancelTask")
+    @MessageMapping("tasks/closeTask")
     public void cancelTask(TaskMessage taskMessage){
-        _tasksHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println(mapper.writeValueAsString(taskMessage));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        if(_tasksHandler.taskCompleted(taskMessage.getLobby(), taskMessage.getPlayer())){
+            _tasksHandler.finishTask(taskMessage.getLobby(), taskMessage.getId());
+        }else {
+            _tasksHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
+        }
+
         stateOfTasks(taskMessage.getLobby());
         _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), "");
     }

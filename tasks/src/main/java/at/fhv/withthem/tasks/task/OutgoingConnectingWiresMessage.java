@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class OutgoingConnectingWiresMessage extends TaskMessage {
     private final short[][] _plugs;
-    private final short[][] _wires;
+    private final boolean[] _wires;
 
     @JsonCreator
-    public OutgoingConnectingWiresMessage(short[][] plugs, short[][] wires){
+    public OutgoingConnectingWiresMessage(short[][] plugs, boolean[] wires){
         super("Connecting Wires");
         _plugs = plugs;
         _wires = wires;
@@ -18,7 +18,7 @@ public class OutgoingConnectingWiresMessage extends TaskMessage {
         return _plugs;
     }
 
-    public short[][] getWires() {
+    public boolean[] getWires() {
         return _wires;
     }
 

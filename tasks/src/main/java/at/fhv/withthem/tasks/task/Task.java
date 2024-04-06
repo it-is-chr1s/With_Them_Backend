@@ -32,7 +32,11 @@ public abstract class Task {
         return _player;
     }
 
-    public abstract void playerAction(TaskMessage msg, TaskCompletedListener listener);
+    public abstract void playerAction(TaskMessage msg);
+
+    public abstract void reset();
+
+    public abstract boolean taskCompleted();
 
     public abstract TaskMessage getCurrentState();
 
