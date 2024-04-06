@@ -37,6 +37,7 @@ public class TaskConnectingWires extends Task{
 
     @Override
     public void reset(){
+        setPlayer(null);
         resetConnectedPlugs();
         shufflePlugs();
     }

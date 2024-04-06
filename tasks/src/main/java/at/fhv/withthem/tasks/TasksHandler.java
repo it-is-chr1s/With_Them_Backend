@@ -40,6 +40,7 @@ public class TasksHandler {
         for(Task taskObj :  _availableTasks.get(lobby)){
             if(taskObj.getId() == taskId){
                 taskObj.setPlayer(player);
+                System.out.println(taskObj.getPlayer());
                 _availableTasks.get(lobby).remove(taskObj);
                 _activeTasks.get(lobby).add(taskObj);
                 System.out.println("started Task: " + taskId);

@@ -16,8 +16,7 @@ public abstract class Task {
     }
 
     public void setPlayer(String player) {
-        if(_player == null)
-            _player = player;
+        _player = player;
     }
 
     public void setId(int id) {
