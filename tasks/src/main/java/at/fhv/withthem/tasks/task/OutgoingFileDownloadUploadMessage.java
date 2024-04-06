@@ -8,7 +8,7 @@ public class OutgoingFileDownloadUploadMessage extends TaskMessage {
 
     @JsonCreator
     public OutgoingFileDownloadUploadMessage(String status){
-        super("TaskFileDownloadUpload");
+        super("FileDownloadUpload");
         _status = status;
     }
 

@@ -1,7 +1,19 @@
 package at.fhv.withthem.tasks;
 
+import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type",
+        defaultImpl = TaskMessage.class
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires")
+})
 public class TaskMessage {
     private String _lobby;
     private String _task;
@@ -50,5 +62,9 @@ public class TaskMessage {
 
     public int getId(){
         return _id;
+    }
+
+    public void setId(int id){
+        _id = id;
     }
 }

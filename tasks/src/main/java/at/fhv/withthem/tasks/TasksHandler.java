@@ -39,12 +39,13 @@ public class TasksHandler {
         }
     }
 
-    public void startTask(String lobby, String task, String player){
+    public void startTask(String lobby, int taskId, String player){
         for(Task taskObj :  _availableTasks.get(lobby)){
-            if(taskObj.getType().equals(task)){
+            if(taskObj.getId() == taskId){
                 taskObj.setPlayer(player);
                 _availableTasks.get(lobby).remove(taskObj);
                 _activeTasks.get(lobby).add(taskObj);
+                System.out.println("started Task: " + taskId);
                 break;
             }
         }
@@ -70,6 +71,7 @@ public class TasksHandler {
                 TaskMessage taskMessage =  task.getCurrentState();
                 taskMessage.setLobby(lobby);
                 taskMessage.setPlayer(player);
+                taskMessage.setId(task.getId());
                 return taskMessage;
             }
         }
@@ -87,9 +89,11 @@ public class TasksHandler {
         }
     }
 
-    public void cancelTask(String lobby, String task, String player){
+    public void cancelTask(String lobby, int id){
+        System.out.println("Cancel task: " + id);
         for(Task taskObj : _activeTasks.get(lobby)) {
-            if (taskObj.getType().equals(task) && taskObj.getPlayer().equals(player)) {
+            if (taskObj.getId() == id) {
+                System.out.println("Success");
                 _activeTasks.get(lobby).remove(taskObj);
                 _availableTasks.get(lobby).add(taskObj);
                 break;
@@ -105,6 +109,16 @@ public class TasksHandler {
         }
 
         return availableTasks;
+    }
+
+    public List<TaskMessage> getActiveTasks(String lobby){
+        List<TaskMessage> activeTasks = new ArrayList<>();
+
+        for(Task task : _activeTasks.get(lobby)){
+            activeTasks.add(new TaskMessage(task.getType(), task.getId()));
+        }
+
+        return activeTasks;
     }
 
     public int getFinishedTasks(String lobby){

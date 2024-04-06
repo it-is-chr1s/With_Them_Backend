@@ -6,26 +6,35 @@ import java.util.Random;
 
 public class TaskConnectingWires extends Task{
     private final int _amountOfWires = 4;
-    private final short[][] _wires;
-    private int _counter = 0;
+    private final short[][] _plugs;
+    private final short[][] _connectedPlugs;
 
     public TaskConnectingWires() {
         super("Connecting Wires");
-        _wires = new short[_amountOfWires][2];
-        createWires();
-        shuffleWires();
+        _plugs = new short[_amountOfWires][2];
+        _connectedPlugs = new short[_amountOfWires][2];
+        resetConnectedPlugs();
+        createPlugs();
+        shufflePlugs();
     }
 
     @Override
     public void playerAction(TaskMessage msg, TaskCompletedListener listener){
         IncomingConnectingWiresMessage msg_cw = (IncomingConnectingWiresMessage) msg;
-        if(_wires[msg_cw.getWire1()][1] == msg_cw.getWire2()){
-            _counter++;
+        System.out.print("Plug1: " + msg_cw.getPlug1() + " Plug2: " + msg_cw.getPlug2() + "\n");
+        if(msg_cw.getPlug2() == msg_cw.getPlug1()){
+            short pos = 0;
+            while(_plugs[pos][1] != msg_cw.getPlug1()){
+                pos++;
+            }
+            _connectedPlugs[pos][1] = _plugs[pos][1];
+            System.out.println("Correct");
         }else{
-            _counter = 0;
+            resetConnectedPlugs();
+            System.out.println("Wrong");
         }
 
-        if(_counter == _amountOfWires){
+        if(allPlugsConnected()){
             listener.taskCompleted();
         }
 
@@ -33,23 +42,39 @@ public class TaskConnectingWires extends Task{
 
     @Override
     public TaskMessage getCurrentState(){
-        return new OutgoingConnectingWiresMessage(_wires, _counter);
+        return new OutgoingConnectingWiresMessage(_plugs, _connectedPlugs);
     }
 
-    private void createWires(){
+    private boolean allPlugsConnected(){
         for(short i = 0; i < _amountOfWires; i++) {
-            _wires[i][0] = i;
-            _wires[i][1] = i;
+            if(_connectedPlugs[i][1] == -1){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void resetConnectedPlugs(){
+        for(short i = 0; i < _amountOfWires; i++) {
+            _connectedPlugs[i][0] = i;
+            _connectedPlugs[i][1] = -1;
         }
     }
 
-    private void shuffleWires(){
+    private void createPlugs(){
+        for(short i = 0; i < _amountOfWires; i++) {
+            _plugs[i][0] = i;
+            _plugs[i][1] = i;
+        }
+    }
+
+    private void shufflePlugs(){
         Random random = new Random();
         for(int i = 1; i < _amountOfWires; i++){
             int randIndex = random.nextInt(i + 1);
-            short temp = _wires[i][1];
-            _wires[i][1] = _wires[randIndex][1];
-            _wires[randIndex][1] = temp;
+            short temp = _plugs[i][1];
+            _plugs[i][1] = _plugs[randIndex][1];
+            _plugs[randIndex][1] = temp;
         }
     }
 }

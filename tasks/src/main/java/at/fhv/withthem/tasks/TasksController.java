@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -35,23 +37,57 @@ public class TasksController {
         }
 
         System.out.println(mapper.writeValueAsString(_tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby())));
-        //_messagingTemplate.convertAndSend("/topic/tasks/availableTasks", _tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby()));;
+        stateOfTasks(initTaskMessages.get(0).getLobby());
+    }
+/*
+    @MessageMapping("tasks/requestAvailableTasks")
+    public void sendAvailableTasks(@Payload String lobbyID) {
+        System.out.println("Available tasks requested for lobby: " + lobbyID);
+        _messagingTemplate.convertAndSend("/topic/tasks/availableTasks", _tasksHandler.getAvailableTasks(lobbyID));
+    }*/
+
+    @MessageMapping("tasks/requestStateOfTasks")
+    public void stateOfTasks(@Payload String lobbyID) {
+        HashMap<Integer, String> tasks = new HashMap<>();
+        for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(lobbyID)){
+            tasks.put(taskMessage.getId(), "available");
+        }
+        for (TaskMessage taskMessage : _tasksHandler.getActiveTasks(lobbyID)){
+            tasks.put(taskMessage.getId(), "active");
+        }
+
+        _messagingTemplate.convertAndSend("/topic/tasks/stateOfTasks", tasks);
     }
 
-    @MessageMapping("/startTask")
+    @MessageMapping("tasks/startTask")
     public void startTask(TaskMessage taskMessage){
-        _tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getTask(), taskMessage.getPlayer());
-        //sendBack to player current status
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("Task started: " + mapper.writeValueAsString(taskMessage));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        _tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getId(), taskMessage.getPlayer());
+        stateOfTasks(taskMessage.getLobby());
+        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
     }
 
-    @MessageMapping("/playerAction")
+    @MessageMapping("/tasks/playerAction")
     public void playerAction(TaskMessage taskMessage){
         _tasksHandler.playerAction(taskMessage);
+        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
     }
 
     @MessageMapping("/availableTasks")
     public void getAvailableTasks(@Payload String lobbyID){
         System.out.println("Available tasks requested for lobby: " + _tasksHandler.getAvailableTasks(lobbyID).toString());
+    }
+
+    @MessageMapping("tasks/cancelTask")
+    public void cancelTask(TaskMessage taskMessage){
+        _tasksHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
+        stateOfTasks(taskMessage.getLobby());
+        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), "");
     }
 
     //publish available tasks to the lobby

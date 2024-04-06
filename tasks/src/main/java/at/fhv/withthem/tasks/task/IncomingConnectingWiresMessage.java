@@ -4,21 +4,29 @@ import at.fhv.withthem.tasks.TaskMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class IncomingConnectingWiresMessage extends TaskMessage {
-    private int _wire1;
-    private int _wire2;
+    private short _plug1;
+    private short _plug2;
 
     @JsonCreator
-    public IncomingConnectingWiresMessage(String lobby, String task, String player, int wire1, int wire2) {
+    public IncomingConnectingWiresMessage(String lobby, String task, String player, short plug1, short plug2) {
         super(lobby, task, player);
-        _wire1 = wire1;
-        _wire2 = wire2;
+        _plug1 = plug1;
+        _plug2 = plug2;
     }
 
-    public int getWire1() {
-        return _wire1;
+    public void setPlug1(short plug1) {
+        _plug1 = plug1;
     }
 
-    public int getWire2() {
-        return _wire2;
+    public void setPlug2(short plug2) {
+        _plug2 = plug2;
+    }
+
+    public short getPlug1() {
+        return _plug1;
+    }
+
+    public short getPlug2() {
+        return _plug2;
     }
 }
