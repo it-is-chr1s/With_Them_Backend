@@ -54,7 +54,7 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(playerName)) {
-            gameService.registerPlayer(playerName, new Position(0, 0));
+            gameService.registerPlayer(playerName, new Position(0, 0)/*, colore*/);
         }
 
         gameService.updatePlayerDirection(playerName, direction);

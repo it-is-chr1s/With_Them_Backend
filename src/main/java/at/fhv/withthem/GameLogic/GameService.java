@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
+
     private final GameMap map = new GameMap(40, 20);
     private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
 
@@ -74,8 +75,8 @@ public class GameService {
         return players.containsKey(playerId);
     }
 
-    public void registerPlayer(String playerId, Position startPosition) {
-        players.put(playerId, new Player(playerId, startPosition));
+    public void registerPlayer(String playerId, Position startPosition/*, collor*/) {
+        players.put(playerId, new Player(playerId, startPosition)/*, collor*/);
     }
 
     public List<Position> getWallPositions() {
