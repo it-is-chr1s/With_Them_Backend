@@ -49,7 +49,7 @@ public class GameService {
 
                 if (canMoveTo(newPosition)) {
                     player.setPosition(newPosition);
-                    messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+                    messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition, player.getColor().getHexValue()));
 
                     messagingTemplate.convertAndSend("/topic/player/" + id + "/controlsEnabled/task", canDoTask(player.getPosition()));
                 }
