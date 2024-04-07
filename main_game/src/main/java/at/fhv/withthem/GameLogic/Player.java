@@ -8,10 +8,11 @@ public class Player {
     private Position _position;
     private Direction _direction;
     private boolean _hasMoved = false;
-    public Player(String id, Position position) {
+    public Player(String id, Position position, Colors color) {
         this._id = id;
         this._position = position;
         this._direction = Direction.NONE;
+        this._color=color;
     }
 
     public String getId() {
@@ -25,8 +26,7 @@ public class Player {
     public String getName() {return _name;}
 
     public Colors getColor() {return _color;}
-
-    public void set_color(Colors _color) {this._color = _color;  }
+    public void setColor(Colors _color) {this._color = _color;  }
     public Position getPosition() {
         return _position;
     }

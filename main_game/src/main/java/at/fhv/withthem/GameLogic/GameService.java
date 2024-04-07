@@ -11,12 +11,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-
-    private final GameMap map = new GameMap(40, 20);
+    @Autowired
+    private final GameMap map;
     private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    public GameService(GameMap map) {
+        this.map = map;
+    }
 
     public synchronized void updatePlayerDirection(String playerId, Direction direction) {
         Player player = players.get(playerId);
@@ -24,6 +28,13 @@ public class GameService {
             player.setDirection(direction);
             player.setHasMoved(!direction.equals(Direction.NONE));
         }
+    }
+    public synchronized void updatePlayerColor(String playerId, Colors colors) {
+        Player player = players.get(playerId);
+        if (player != null) {
+            player.setColor(colors);
+        }
+        System.out.println("Color changed");
     }
 
     @Scheduled(fixedRate = 1)
@@ -39,6 +50,8 @@ public class GameService {
                 if (canMoveTo(newPosition)) {
                     player.setPosition(newPosition);
                     messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+
+                    messagingTemplate.convertAndSend("/topic/player/" + id + "/controlsEnabled/task", canDoTask(player.getPosition()));
                 }
             }
         });
@@ -58,7 +71,12 @@ public class GameService {
     }
 
     private boolean canMoveTo(Position position) {
-        return map.isWithinBounds((int)position.getX(), (int)position.getY()) && !map.isWall((int)position.getX(), (int)position.getY());
+        return map.isWithinBounds((int)position.getX(), (int)position.getY())
+                && !map.isWall((int)position.getX(), (int)position.getY());
+    }
+
+    private boolean canDoTask(Position position){
+        return map.isTask((int)position.getX(), (int)position.getY());
     }
 
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
@@ -75,8 +93,8 @@ public class GameService {
         return players.containsKey(playerId);
     }
 
-    public void registerPlayer(String playerId, Position startPosition/*, collor*/) {
-        players.put(playerId, new Player(playerId, startPosition)/*, collor*/);
+    public void registerPlayer(String playerId, Position startPosition, Colors color) {
+        players.put(playerId, new Player(playerId, startPosition, color));
     }
 
     public List<Position> getWallPositions() {
@@ -89,6 +107,18 @@ public class GameService {
             }
         }
         return wallPositions;
+    }
+
+    public List<TaskPosition> getTaskPositions(){
+        List<TaskPosition> taskPositions = new ArrayList<>();
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isTask(x, y)) {
+                    taskPositions.add(new TaskPosition(x, y, map.getContent(x, y)));
+                }
+            }
+        }
+        return taskPositions;
     }
 
     public GameMap getMap() {

@@ -1,16 +1,17 @@
-package at.fhv.withthem.GameLogic;
+package at.fhv.withthem.GameLogic.Requests;
 
+import at.fhv.withthem.GameLogic.Colors;
+import at.fhv.withthem.GameLogic.Direction;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class MoveRequest {
     private Direction _direction;
     private String _name;
-
     public MoveRequest() {
     }
 
     @JsonCreator
-    public MoveRequest(Direction direction, String name) {
+    public MoveRequest(Direction direction, String name, Colors color) {
         _direction = direction;
         _name = name;
     }
