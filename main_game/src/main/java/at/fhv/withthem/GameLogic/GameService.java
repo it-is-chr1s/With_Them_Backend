@@ -31,10 +31,10 @@ public class GameService {
     }
     public synchronized void updatePlayerColor(String playerId, Colors colors) {
         Player player = players.get(playerId);
-        if (player != null) {
+        if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
+            messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
         }
-        System.out.println("Color changed");
     }
 
     @Scheduled(fixedRate = 1)
@@ -50,7 +50,6 @@ public class GameService {
                 if (canMoveTo(newPosition)) {
                     player.setPosition(newPosition);
                     messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition, player.getColor().getHexValue()));
-
                     messagingTemplate.convertAndSend("/topic/player/" + id + "/controlsEnabled/task", canDoTask(player.getPosition()));
                 }
             }
@@ -95,6 +94,10 @@ public class GameService {
 
     public void registerPlayer(String playerId, Position startPosition, Colors color) {
         players.put(playerId, new Player(playerId, startPosition, color));
+        //Draws the player on the map as soon as they enter the game
+        // TODO: loop through all players here to draw them all
+        messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
+
     }
 
     public List<Position> getWallPositions() {
