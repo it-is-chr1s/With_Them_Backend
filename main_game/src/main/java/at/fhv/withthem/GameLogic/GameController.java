@@ -23,31 +23,6 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    /*
-
-    @MessageMapping("/move")
-    public void handleMove(MoveRequest moveRequest) {
-
-        String playerName = moveRequest.getName();
-        Direction direction = moveRequest.getDirection();
-
-        System.out.println("moving player");
-        System.out.println(playerName);
-        System.out.println(direction);
-
-        if (!gameService.playerExists(playerName)) {
-            gameService.registerPlayer(playerName, new Position(0, 0));
-        }
-
-        boolean success = gameService.movePlayer(playerName, direction, 0.01f);
-        if (success) {
-            Player player = gameService.getPlayer(playerName);
-            messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerName, player.getPosition()));
-        }
-    }
-
-
-    */
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
         String playerName = moveRequest.getName();

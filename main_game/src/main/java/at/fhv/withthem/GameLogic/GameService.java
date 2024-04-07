@@ -1,18 +1,19 @@
 package at.fhv.withthem.GameLogic;
 
+import at.fhv.withthem.GameSession.GameSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    private final GameMap map = new GameMap(40, 20);
-    private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String, GameSession> gameSessions = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -27,70 +28,55 @@ public class GameService {
 
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
-        players.forEach((id, player) -> {
-            if (player.hasMoved()) {
-                Position currentPosition = player.getPosition();
-                Direction direction = player.getDirection();
-                float speed = 0.01f;
+        gameSessions.forEach((id, session) -> {
+            ConcurrentHashMap<String, Player> players = session.getPlayers();
+            players.forEach((playerId, player) -> {
+                if (player.hasMoved()) {
+                    Position currentPosition = player.getPosition();
+                    Direction direction = player.getDirection();
+                    float speed = 0.01f;
 
-                Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+                    Position newPosition = session.calculateNewPosition(currentPosition, direction, speed);
 
-                if (canMoveTo(newPosition)) {
-                    player.setPosition(newPosition);
-                    messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+                    if (session.canMoveTo(newPosition)) {
+                        player.setPosition(newPosition);
+                        messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition));
+                    }
                 }
-            }
+            });
         });
+
     }
 
-    public synchronized boolean movePlayer(String playerId, Direction direction, float speed) {
-        Player player = players.get(playerId);
-        Position currentPosition = player.getPosition();
+    private void broadcastSessionState(String sessionId, GameSession session) {
+        Map<String, Object> state = new HashMap<>();
+        state.put("players", session.getPlayers());
+        state.put("walls", session.getWallPositions());
 
-        Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+        messagingTemplate.convertAndSend("/topic/gameState/" + sessionId, state);
+    }
 
-        if (canMoveTo(newPosition)) {
-            player.setPosition(newPosition);
-            return true;
+    public GameSession createSession(int width, int height) {
+        String sessionId = UUID.randomUUID().toString();
+        GameSession session = new GameSession(sessionId, width, height);
+        gameSessions.put(sessionId, session);
+        return session;
+    }
+
+    public GameSession getSession(String sessionId) {
+        return gameSessions.get(sessionId);
+    }
+
+    public void removeSession(String sessionId) {
+        gameSessions.remove(sessionId);
+    }
+
+    public boolean movePlayerInSession(String sessionId, String playerId, Direction direction, float speed) {
+        GameSession session = getSession(sessionId);
+        if (session != null) {
+            return session.movePlayer(playerId, direction, speed);
         }
         return false;
     }
 
-    private boolean canMoveTo(Position position) {
-        return map.isWithinBounds((int)position.getX(), (int)position.getY()) && !map.isWall((int)position.getX(), (int)position.getY());
-    }
-
-    private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
-        float newX = currentPosition.getX() + direction.getDx() * speed;
-        float newY = currentPosition.getY() + direction.getDy() * speed;
-        return new Position(newX, newY);
-    }
-
-    public Player getPlayer(String playerId) {
-        return players.get(playerId);
-    }
-
-    public boolean playerExists(String playerId) {
-        return players.containsKey(playerId);
-    }
-
-    public void registerPlayer(String playerId, Position startPosition) {
-        players.put(playerId, new Player(playerId, startPosition));
-    }
-
-    public List<Position> getWallPositions() {
-        List<Position> wallPositions = new ArrayList<>();
-        for (int y = 0; y < map.getHeight(); y++) {
-            for (int x = 0; x < map.getWidth(); x++) {
-                if (map.isWall(x, y)) {
-                    wallPositions.add(new Position(x, y));
-                }
-            }
-        }
-        return wallPositions;
-    }
-
-    public GameMap getMap() {
-        return map;
-    }
 }
