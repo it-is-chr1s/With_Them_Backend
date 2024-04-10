@@ -1,5 +1,6 @@
 package at.fhv.withthem.tasks;
 
+import at.fhv.withthem.tasks.task.Reaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +75,18 @@ public class TasksController {
 
     @MessageMapping("/tasks/playerAction")
     public void playerAction(TaskMessage taskMessage){
-        _tasksHandler.playerAction(taskMessage);
-        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+        _tasksHandler.playerAction(taskMessage, new Reaction(){
+            @Override
+            public void react(){
+                ObjectMapper mapper = new ObjectMapper();
+                try {
+                    System.out.println(mapper.writeValueAsString(_tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer())));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+            }
+        });
     }
 
     @MessageMapping("/availableTasks")

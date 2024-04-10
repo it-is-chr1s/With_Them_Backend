@@ -31,7 +31,7 @@ public abstract class Task {
         return _player;
     }
 
-    public abstract void playerAction(TaskMessage msg);
+    public abstract void playerAction(TaskMessage msg, Reaction reaction);
 
     public abstract void reset();
 

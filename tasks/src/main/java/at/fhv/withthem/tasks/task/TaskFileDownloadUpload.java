@@ -2,47 +2,87 @@ package at.fhv.withthem.tasks.task;
 
 import at.fhv.withthem.tasks.TaskMessage;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class TaskFileDownloadUpload extends Task{
-    private final float speed = 1.0f;
-    private final int downloadPosition_x = 5;
-    private final int downloadPosition_y = 5;
-
-    private final int uploadPosition_x = 10;
-    private final int uploadPosition_y = 10;
-
-    private int counter = 0;
+    //private final float speed = 1.0f;
+    private String _state;
+    private float _progress;
+    private ScheduledExecutorService executorService;
+    private ScheduledFuture<?> _future;
 
     public TaskFileDownloadUpload() {
         super("FileDownloadUpload");
+        reset();
+        executorService = Executors.newScheduledThreadPool(1);
     }
 
     @Override
-    public void playerAction(TaskMessage msg){
+    public void playerAction(TaskMessage msg, Reaction reaction){
         IncomingFileDownloadUploadMessage msg_fdu = (IncomingFileDownloadUploadMessage) msg;
-        if(msg_fdu.getMake().equals("download")){ //player is at downloadPosition
-            if(counter == 0){
-                counter++;
-            }
-        }else if(msg_fdu.getMake().equals("upload")){
-            if(counter == 1){
-                counter++;
-            }
+        if(msg_fdu.getMake().equals("Download")) {
+            final Runnable download = new Runnable() {
+                @Override
+                public void run() {
+                    _progress += 0.1f;
+                    reaction.react();
+                }
+            };
+            _future = executorService.scheduleAtFixedRate(download, 0, 1, TimeUnit.SECONDS);
+            executorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    if(_progress >= 1.0f) {
+                        _state = "Upload";
+                        _progress = -1.0f;
+                        reaction.react();
+                    }
+                    _future.cancel(true);
+                }
+            }, 9, TimeUnit.SECONDS);
+        }else if(msg_fdu.getMake().equals("openFileUpload")){
+            _state = "Upload";
+            _progress = 0.0f;
+            reaction.react();
+        }else if(msg_fdu.getMake().equals("Upload")){
+            final Runnable download = new Runnable() {
+                @Override
+                public void run() {
+                    _progress += 0.1f;
+                    reaction.react();
+                }
+            };
+            _future =  executorService.scheduleAtFixedRate(download, 0, 1, TimeUnit.SECONDS);
+            executorService.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    if(_progress >= 1.0f) {
+                        _future.cancel(true);
+                    }
+                }
+            }, 9, TimeUnit.SECONDS);
         }
     }
 
     @Override
     public void reset(){
-        counter = 0;
+        if(_future != null)
+            _future.cancel(true);
+        _state = "Download";
+        _progress = 0.0f;
     }
 
     @Override
     public boolean taskCompleted(){
-        return counter == 2;
+        return (_state.equals("Upload") && _progress >= 1.0f);
     }
 
     @Override
     public TaskMessage getCurrentState(){
-        return new OutgoingFileDownloadUploadMessage((counter == 0) ? "readyForDownload" : (counter == 1) ? "readyForUpload" : "completed");
+        return new OutgoingFileDownloadUploadMessage(_state, _progress);
     }
 
     @Override

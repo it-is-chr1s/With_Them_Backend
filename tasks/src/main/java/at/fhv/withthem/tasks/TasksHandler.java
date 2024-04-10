@@ -1,5 +1,6 @@
 package at.fhv.withthem.tasks;
 
+import at.fhv.withthem.tasks.task.Reaction;
 import at.fhv.withthem.tasks.task.TaskConnectingWires;
 import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
@@ -49,10 +50,10 @@ public class TasksHandler {
         }
     }
 
-    public void playerAction(TaskMessage taskMessage) {
+    public void playerAction(TaskMessage taskMessage, Reaction reaction) {
         for(Task task : _activeTasks.get(taskMessage.getLobby())) {
             if(task.getPlayer().equals(taskMessage.getPlayer())){
-                task.playerAction(taskMessage);
+                task.playerAction(taskMessage, reaction);
                 break;
             }
         }

@@ -12,6 +12,10 @@ public class IncomingFileDownloadUploadMessage extends TaskMessage {
         _make = make;
     }
 
+    public void setMake(String make) {
+        _make = make;
+    }
+
     public String getMake() {
         return _make;
     }

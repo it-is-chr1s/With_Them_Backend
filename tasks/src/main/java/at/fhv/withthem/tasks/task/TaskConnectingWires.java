@@ -19,7 +19,7 @@ public class TaskConnectingWires extends Task{
     }
 
     @Override
-    public void playerAction(TaskMessage msg){
+    public void playerAction(TaskMessage msg, Reaction reaction){
         IncomingConnectingWiresMessage msg_cw = (IncomingConnectingWiresMessage) msg;
         System.out.print("Plug1: " + msg_cw.getPlug1() + " Plug2: " + msg_cw.getPlug2() + "\n");
         if(msg_cw.getPlug2() == msg_cw.getPlug1()){
@@ -33,6 +33,8 @@ public class TaskConnectingWires extends Task{
             resetConnectedPlugs();
             System.out.println("Wrong");
         }
+
+        reaction.react();
     }
 
     @Override
