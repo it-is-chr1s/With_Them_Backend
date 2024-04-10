@@ -32,6 +32,6 @@ public class WiththemApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		_map.initializeMapLayout();
-		_gameController.loadTasks("123", _gameService.getTaskPositions());
+		//_gameController.loadTasks("123", _gameService.getTaskPositions());
 	}
 }
