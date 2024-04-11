@@ -13,10 +13,10 @@ import java.util.List;
 
 @Component
 public class TasksHandler {
-    private final List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
+    /*private final List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
             new TaskConnectingWires(),
             new TaskFileDownloadUpload()
-    ));
+    ));*/
     private final HashMap<String, List<Task>> _availableTasks = new HashMap<>();
     private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
     private final HashMap<String, Integer> _finishedTasks = new HashMap<>();
@@ -28,11 +28,11 @@ public class TasksHandler {
             _finishedTasks.put(lobby, 0);
         }
 
-        for(Task possibleTask : _possibleTasks){
-            if(possibleTask.equals(taskType) && _availableTasks.get(lobby).stream().noneMatch(task -> task.getId() == taskID)){
-                possibleTask.setId(taskID);
-                _availableTasks.get(lobby).add(possibleTask);
-                break;
+        if(_availableTasks.get(lobby).stream().noneMatch(task -> task.getId() == taskID)){
+            if(taskType.equals("Connecting Wires")) {
+                _availableTasks.get(lobby).add(new TaskConnectingWires(taskID));
+            }else if(taskType.equals("File Upload") || taskType.equals("File Download")){
+                _availableTasks.get(lobby).add(new TaskFileDownloadUpload(taskID));
             }
         }
     }

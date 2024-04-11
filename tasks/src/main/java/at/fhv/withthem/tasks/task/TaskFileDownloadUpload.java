@@ -11,11 +11,12 @@ public class TaskFileDownloadUpload extends Task{
     //private final float speed = 1.0f;
     private String _state;
     private float _progress;
+    private boolean _running;
     private ScheduledExecutorService executorService;
     private ScheduledFuture<?> _future;
 
-    public TaskFileDownloadUpload() {
-        super("FileDownloadUpload");
+    public TaskFileDownloadUpload(int id) {
+        super("FileDownloadUpload", id);
         reset();
         executorService = Executors.newScheduledThreadPool(1);
     }
@@ -23,7 +24,8 @@ public class TaskFileDownloadUpload extends Task{
     @Override
     public void playerAction(TaskMessage msg, Reaction reaction){
         IncomingFileDownloadUploadMessage msg_fdu = (IncomingFileDownloadUploadMessage) msg;
-        if(msg_fdu.getMake().equals("Download")) {
+        if(msg_fdu.getMake().equals("Download") && !_running){
+            _running = true;
             final Runnable download = new Runnable() {
                 @Override
                 public void run() {
@@ -38,6 +40,7 @@ public class TaskFileDownloadUpload extends Task{
                     if(_progress >= 1.0f) {
                         _state = "Upload";
                         _progress = -1.0f;
+                        _running = false;
                         reaction.react();
                     }
                     _future.cancel(true);
@@ -47,7 +50,8 @@ public class TaskFileDownloadUpload extends Task{
             _state = "Upload";
             _progress = 0.0f;
             reaction.react();
-        }else if(msg_fdu.getMake().equals("Upload")){
+        }else if(msg_fdu.getMake().equals("Upload") && !_running){
+            _running = true;
             final Runnable download = new Runnable() {
                 @Override
                 public void run() {
@@ -61,6 +65,7 @@ public class TaskFileDownloadUpload extends Task{
                 public void run() {
                     if(_progress >= 1.0f) {
                         _future.cancel(true);
+                        _running = false;
                     }
                 }
             }, 9, TimeUnit.SECONDS);
@@ -73,6 +78,7 @@ public class TaskFileDownloadUpload extends Task{
             _future.cancel(true);
         _state = "Download";
         _progress = 0.0f;
+        _running = false;
     }
 
     @Override

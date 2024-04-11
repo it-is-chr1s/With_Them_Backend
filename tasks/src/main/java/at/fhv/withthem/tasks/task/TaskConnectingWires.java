@@ -9,8 +9,8 @@ public class TaskConnectingWires extends Task{
     private final short[][] _plugs;
     private final boolean[] _connectedPlugs;
 
-    public TaskConnectingWires() {
-        super("Connecting Wires");
+    public TaskConnectingWires(int id) {
+        super("Connecting Wires", id);
         _plugs = new short[_amountOfWires][2];
         _connectedPlugs = new boolean[_amountOfWires];
         resetConnectedPlugs();
