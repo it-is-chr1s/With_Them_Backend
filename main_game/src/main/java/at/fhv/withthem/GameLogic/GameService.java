@@ -30,7 +30,7 @@ public class GameService {
         Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
         }
     }
 
@@ -48,8 +48,8 @@ public class GameService {
 
                     if (canMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
-                        messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
-                        messagingTemplate.convertAndSend("/topic/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                     }
                 }
             });
@@ -100,7 +100,7 @@ public class GameService {
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         // TODO: loop through all players here to draw them all
-        messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
+        messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
 
     }
     public String registerGame() {

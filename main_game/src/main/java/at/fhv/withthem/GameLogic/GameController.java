@@ -97,7 +97,7 @@ public class GameController {
         mapLayout.put("width", gameService.getMap(gameId).getWidth());
         mapLayout.put("height", gameService.getMap(gameId).getHeight());
 
-        messagingTemplate.convertAndSend("/topic/mapLayout", mapLayout);
+        messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
 
     public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) throws JsonProcessingException {
