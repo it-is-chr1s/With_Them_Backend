@@ -49,7 +49,7 @@ public class GameService {
                     if (canMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                     }
                 }
             });
