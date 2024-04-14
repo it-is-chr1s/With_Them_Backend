@@ -1,6 +1,7 @@
 package at.fhv.withthem.tasks;
 
 import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
+import at.fhv.withthem.tasks.task.IncomingFileDownloadUploadMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -12,7 +13,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         defaultImpl = TaskMessage.class
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires")
+        @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires"),
+        @JsonSubTypes.Type(value = IncomingFileDownloadUploadMessage.class, name = "incomingFileDownloadUpload")
 })
 public class TaskMessage {
     private String _lobby;

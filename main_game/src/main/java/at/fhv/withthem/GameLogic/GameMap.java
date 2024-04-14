@@ -34,6 +34,10 @@ public class GameMap {
         setTask(7, 7, "Connecting Wires", 1);
         setTask(11, 5, "File Download", 2);
         setTask(11, 9, "File Upload", 2);
+
+        setTask(15, 7, "Connecting Wires", 3);
+        setTask(19, 5, "File Download", 4);
+        setTask(19, 9, "File Upload", 4);
     }
 
     public void setTask(int x, int y, String type, int id){

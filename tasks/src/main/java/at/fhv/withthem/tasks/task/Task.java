@@ -2,13 +2,14 @@ package at.fhv.withthem.tasks.task;
 
 import at.fhv.withthem.tasks.TaskMessage;
 
-public abstract class Task {
+public abstract class Task{
     private String _player;
     private String _type;
     private int _id;
 
-    public Task(String type) {
+    public Task(String type, int id) {
         _type = type;
+        _id = id;
     }
 
     public String getType() {
@@ -31,7 +32,7 @@ public abstract class Task {
         return _player;
     }
 
-    public abstract void playerAction(TaskMessage msg);
+    public abstract void playerAction(TaskMessage msg, Reaction reaction);
 
     public abstract void reset();
 
