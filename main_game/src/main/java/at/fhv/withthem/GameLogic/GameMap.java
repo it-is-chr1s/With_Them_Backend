@@ -7,6 +7,7 @@ public class GameMap {
     private final String[][] _grid;
     private final int _height = 20;
     private final int _width = 40;
+    //TODO: Constructor without parameters = lobby
     public GameMap() {
         this._grid = new String[_height][_width];
 

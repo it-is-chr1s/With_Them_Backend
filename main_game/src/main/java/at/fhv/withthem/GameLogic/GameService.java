@@ -103,10 +103,10 @@ public class GameService {
         messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
 
     }
-    public String registerGame() {
+    public String registerGame(String hostName) {
         String gameId=generateGameId();
         GameMap map=new GameMap(); //TODO:how to create/find/get map???
-        games.put(gameId, new Game(gameId, map));
+        games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
     private String generateGameId() {

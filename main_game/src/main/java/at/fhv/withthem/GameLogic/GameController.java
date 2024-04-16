@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,9 +27,9 @@ public class GameController {
     private final SimpMessagingTemplate messagingTemplate;
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/createGame")
-    public ResponseEntity<String> createGame() {
+    public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
         // Call the method to register a new game
-        String gameId = gameService.registerGame();
+        String gameId = gameService.registerGame(requestBody.get("hostName"));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
