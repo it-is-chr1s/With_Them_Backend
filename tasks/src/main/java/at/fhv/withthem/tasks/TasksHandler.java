@@ -6,10 +6,7 @@ import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class TasksHandler {
@@ -38,13 +35,15 @@ public class TasksHandler {
     }
 
     public void startTask(String lobby, int taskId, String player){
-        for(Task taskObj :  _availableTasks.get(lobby)){
-            if(taskObj.getId() == taskId){
+        Iterator<Task> iterator = _availableTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
+            if (taskObj.getId() == taskId) {
                 taskObj.setPlayer(player);
                 System.out.println(taskObj.getPlayer());
-                _availableTasks.get(lobby).remove(taskObj);
+                iterator.remove();
                 _activeTasks.get(lobby).add(taskObj);
-                System.out.println("started Task: " + taskId);
+                System.out.println("Started Task: " + taskId);
                 break;
             }
         }
@@ -74,9 +73,12 @@ public class TasksHandler {
     }
 
     public void finishTask(String lobby, int id){
-        for(Task taskObj : _activeTasks.get(lobby)){
-            if(taskObj.getId() == id){
-                _activeTasks.get(lobby).remove(taskObj);
+        Iterator<Task> iterator = _activeTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
+            if (taskObj.getId() == id) {
+                System.out.println("Finish task: " + id);
+                iterator.remove();
                 _finishedTasks.put(lobby, _finishedTasks.get(lobby) + 1);
                 break;
             }
@@ -85,24 +87,27 @@ public class TasksHandler {
 
     public void cancelTask(String lobby, int id){
         System.out.println("Cancel task: " + id);
-        for(Task taskObj : _activeTasks.get(lobby)) {
+        Iterator<Task> iterator = _activeTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
             if (taskObj.getId() == id) {
                 System.out.println("Success");
                 taskObj.reset();
-                _activeTasks.get(lobby).remove(taskObj);
+                iterator.remove();
                 _availableTasks.get(lobby).add(taskObj);
                 break;
             }
         }
     }
 
-    public boolean taskCompleted(String lobby, String player){
+    public boolean taskCompleted(String lobby, int id){
         for(Task task : _activeTasks.get(lobby)){
-            if(task.getPlayer().equals(player) && task.taskCompleted()){
+            if(task.getId() == id && task.taskCompleted()){
+                System.out.println("Task completed: " + id);
                 return true;
             }
         }
-
+        System.out.println("Task not completed: " + id);
         return false;
     }
 

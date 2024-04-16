@@ -102,7 +102,7 @@ public class TasksController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        if(_tasksHandler.taskCompleted(taskMessage.getLobby(), taskMessage.getPlayer())){
+        if(_tasksHandler.taskCompleted(taskMessage.getLobby(), taskMessage.getId())){
             _tasksHandler.finishTask(taskMessage.getLobby(), taskMessage.getId());
         }else {
             _tasksHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
