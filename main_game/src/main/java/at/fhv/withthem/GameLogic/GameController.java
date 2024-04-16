@@ -1,6 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
 import at.fhv.withthem.GameLogic.Requests.ChangeColorRequest;
+import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,7 +90,8 @@ public class GameController {
         gameService.updatePlayerColor(gameId, playerName, color);
     }
     @MessageMapping("/requestMap")
-    public void sendMapLayout(String gameId) {
+    public void sendMapLayout(MapRequest mapRequest) {
+        String gameId = mapRequest.getGameId();
         List<Position> wallPositions = gameService.getWallPositions(gameId);
         List<TaskPosition> taskPositions = gameService.getTaskPositions();//TODO:provide gameId
         Map<String, Object> mapLayout = new HashMap<>();

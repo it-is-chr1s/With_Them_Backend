@@ -11,7 +11,7 @@ public class GameMap {
     public GameMap() {
         this._grid = new String[_height][_width];
 
-        //initializeMapLayout();
+        initializeMapLayout();
     }
 
     public void initializeMapLayout() {
