@@ -1,19 +1,13 @@
 package at.fhv.withthem.GameLogic.Requests;
 
 import at.fhv.withthem.GameLogic.Colors;
+import at.fhv.withthem.GameLogic.Direction;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class ChangeColorRequest {
-    private String _gameId;
-
     private Colors _color;
-    private String _name;
 
-    public String getGameId() {
-        return _gameId;
-    }
-
-    public Colors getColor() {
+    public Colors get_color() {
         return _color;
     }
 
@@ -21,7 +15,7 @@ public class ChangeColorRequest {
         this._color = _color;
     }
 
-    public String getName() {
+    public String get_name() {
         return _name;
     }
 
@@ -29,12 +23,12 @@ public class ChangeColorRequest {
         this._name = _name;
     }
 
+    private String _name;
     public ChangeColorRequest() {
     }
 
     @JsonCreator
-    public ChangeColorRequest(String gameId,String name, String color) {
-        _gameId=gameId;
+    public ChangeColorRequest(String name, String color) {
         _name = name;
         _color = Colors.fromHex(color);
     }
