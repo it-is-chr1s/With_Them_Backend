@@ -13,21 +13,30 @@ public class TasksHandler {
     private final HashMap<String, List<Task>> _availableTasks = new HashMap<>();
     private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
     private final HashMap<String, Integer> _finishedTasks = new HashMap<>();
+    private final Set<String> _initializedLobbies = new HashSet<>();
 
     public void addTaskToLobby(String lobby, String taskType, int taskID){
         if(_availableTasks.get(lobby) == null) {
             _availableTasks.put(lobby, new ArrayList<>());
             _activeTasks.put(lobby, new ArrayList<>());
             _finishedTasks.put(lobby, 0);
+
+            _initializedLobbies.add(lobby);
         }
 
         if(_availableTasks.get(lobby).stream().noneMatch(task -> task.getId() == taskID)){
             if(taskType.equals("Connecting Wires")) {
                 _availableTasks.get(lobby).add(new TaskConnectingWires(taskID));
+                System.out.println("Added Task Connecting Wires: " + taskID);
             }else if(taskType.equals("File Upload") || taskType.equals("File Download")){
                 _availableTasks.get(lobby).add(new TaskFileDownloadUpload(taskID));
+                System.out.println("Added Task File Upload/Download: " + taskID);
             }
         }
+    }
+
+    public boolean lobbyExists(String lobbyId){
+        return _initializedLobbies.contains(lobbyId);
     }
 
     public void startTask(String lobby, int taskId, String player){

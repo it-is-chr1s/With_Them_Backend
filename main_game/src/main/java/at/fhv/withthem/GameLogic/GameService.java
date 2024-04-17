@@ -130,8 +130,8 @@ public class GameService {
         return wallPositions;
     }
 
-    public List<TaskPosition> getTaskPositions(){
-        GameMap map =new GameMap();//TODO:???
+    public List<TaskPosition> getTaskPositions(String gameId){
+        GameMap map = getMap(gameId);
         List<TaskPosition> taskPositions = new ArrayList<>();
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {

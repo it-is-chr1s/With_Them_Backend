@@ -32,23 +32,35 @@ public class TasksController {
 
     @PostMapping("/loadAvailableTasks")
     public void loadLobby(@RequestBody List<InitTaskMessage> initTaskMessages) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        for (InitTaskMessage initTaskMessage : initTaskMessages) {
-            _tasksHandler.addTaskToLobby(initTaskMessage.getLobby(), initTaskMessage.getType(), initTaskMessage.getId());
-        }
+        System.out.println(initTaskMessages.get(0).getLobby() + " -> " + _tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby()));
+        if(!_tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby())) {
+            ObjectMapper mapper = new ObjectMapper();
+            for (InitTaskMessage initTaskMessage : initTaskMessages) {
+                _tasksHandler.addTaskToLobby(initTaskMessage.getLobby(), initTaskMessage.getType(), initTaskMessage.getId());
+            }
 
-        System.out.println(mapper.writeValueAsString(_tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby())));
-        stateOfTasks(initTaskMessages.get(0).getLobby());
+            System.out.println(mapper.writeValueAsString(_tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby())));
+            stateOfTasks(initTaskMessages.get(0).getLobby());
+        }
     }
 
     @MessageMapping("tasks/requestStateOfTasks")
     public void stateOfTasks(@Payload String lobbyID) {
+        System.out.println("requestStateOfTasks for " + lobbyID);
+
         HashMap<Integer, String> tasks = new HashMap<>();
         for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(lobbyID)){
             tasks.put(taskMessage.getId(), "available");
         }
         for (TaskMessage taskMessage : _tasksHandler.getActiveTasks(lobbyID)){
             tasks.put(taskMessage.getId(), "active");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println(mapper.writeValueAsString(tasks));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
         _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/stateOfTasks", tasks);

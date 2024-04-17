@@ -30,6 +30,8 @@ public class GameController {
     public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
         // Call the method to register a new game
         String gameId = gameService.registerGame(requestBody.get("hostName"));
+
+        loadTasks(gameId, gameService.getTaskPositions(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -92,7 +94,7 @@ public class GameController {
     public void sendMapLayout(MapRequest mapRequest) {
         String gameId = mapRequest.getGameId();
         List<Position> wallPositions = gameService.getWallPositions(gameId);
-        List<TaskPosition> taskPositions = gameService.getTaskPositions();//TODO:provide gameId
+        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);//TODO:provide gameId
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
@@ -102,13 +104,17 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
 
-    public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) throws JsonProcessingException {
+    public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) {
         List<InitTaskMessage> initTaskMessages = new ArrayList<>();
         for (TaskPosition taskPosition : taskPositions) {
             initTaskMessages.add(new InitTaskMessage(lobbyID, taskPosition.getTaskType(), taskPosition.getId()));
         }
         ObjectMapper mapper = new ObjectMapper();
-        System.out.println(mapper.writeValueAsString(initTaskMessages));
+        try {
+            System.out.println(mapper.writeValueAsString(initTaskMessages));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         //messagingTemplate.convertAndSend("/tasks/loadAvailableTasks", initTaskMessages);
 
         String url = "http://localhost:4001/loadAvailableTasks";
