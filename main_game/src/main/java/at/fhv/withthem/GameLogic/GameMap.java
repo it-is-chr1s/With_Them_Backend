@@ -7,10 +7,11 @@ public class GameMap {
     private final String[][] _grid;
     private final int _height = 20;
     private final int _width = 40;
+    //TODO: Constructor without parameters = lobby
     public GameMap() {
         this._grid = new String[_height][_width];
 
-        //initializeMapLayout();
+        initializeMapLayout();
     }
 
     public void initializeMapLayout() {
@@ -34,6 +35,10 @@ public class GameMap {
         setTask(7, 7, "Connecting Wires", 1);
         setTask(11, 5, "File Download", 2);
         setTask(11, 9, "File Upload", 2);
+
+        setTask(15, 7, "Connecting Wires", 3);
+        setTask(19, 5, "File Download", 4);
+        setTask(19, 9, "File Upload", 4);
     }
 
     public void setTask(int x, int y, String type, int id){

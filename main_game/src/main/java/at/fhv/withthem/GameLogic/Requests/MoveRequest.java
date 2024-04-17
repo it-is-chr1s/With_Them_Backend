@@ -5,13 +5,15 @@ import at.fhv.withthem.GameLogic.Direction;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class MoveRequest {
+    private String _gameId;
     private Direction _direction;
     private String _name;
     public MoveRequest() {
     }
 
     @JsonCreator
-    public MoveRequest(Direction direction, String name, Colors color) {
+    public MoveRequest(String gameId, Direction direction, String name, Colors color) {
+        _gameId=gameId;
         _direction = direction;
         _name = name;
     }
@@ -26,6 +28,9 @@ public class MoveRequest {
 
     public String getName() {
         return _name;
+    }
+    public String getGameId() {
+        return _gameId;
     }
 
     public void setName(String name) {
