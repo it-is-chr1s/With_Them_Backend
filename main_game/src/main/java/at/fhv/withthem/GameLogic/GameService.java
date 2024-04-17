@@ -12,9 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    //@Autowired
     private final ConcurrentHashMap<String, Game> games = new ConcurrentHashMap<>();
-
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -26,6 +24,7 @@ public class GameService {
             player.setHasMoved(!direction.equals(Direction.NONE));
         }
     }
+
     public synchronized void updatePlayerColor(String gameId, String playerId, Colors colors) {
         Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
@@ -92,6 +91,7 @@ public class GameService {
     public ConcurrentHashMap<String, Player> getPlayers(String gameId){
         return getGame(gameId).getPlayers();
     }
+
     public boolean playerExists(String gameId, String playerId) {
         return getPlayers(gameId).containsKey(playerId);
     }
@@ -103,17 +103,20 @@ public class GameService {
         messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
 
     }
+
     public String registerGame(String hostName) {
         String gameId=generateGameId();
         GameMap map=new GameMap(); //TODO:how to create/find/get map???
         games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
+
     private String generateGameId() {
         // unique game ID
         //TODO:find better method
         return UUID.randomUUID().toString();
     }
+
     public List<Position> getWallPositions(String gameId) {
         GameMap map =getMap(gameId);
         List<Position> wallPositions = new ArrayList<>();
@@ -127,8 +130,8 @@ public class GameService {
         return wallPositions;
     }
 
-    public List<TaskPosition> getTaskPositions(){
-        GameMap map =new GameMap();//TODO:???
+    public List<TaskPosition> getTaskPositions(String gameId){
+        GameMap map = getMap(gameId);
         List<TaskPosition> taskPositions = new ArrayList<>();
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
@@ -139,6 +142,7 @@ public class GameService {
         }
         return taskPositions;
     }
+
     public Game getGame(String gameId) {
         return games.get(gameId);
     }

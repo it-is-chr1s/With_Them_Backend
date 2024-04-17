@@ -6,45 +6,49 @@ import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class TasksHandler {
-    /*private final List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
-            new TaskConnectingWires(),
-            new TaskFileDownloadUpload()
-    ));*/
     private final HashMap<String, List<Task>> _availableTasks = new HashMap<>();
     private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
     private final HashMap<String, Integer> _finishedTasks = new HashMap<>();
+    private final Set<String> _initializedLobbies = new HashSet<>();
 
     public void addTaskToLobby(String lobby, String taskType, int taskID){
         if(_availableTasks.get(lobby) == null) {
             _availableTasks.put(lobby, new ArrayList<>());
             _activeTasks.put(lobby, new ArrayList<>());
             _finishedTasks.put(lobby, 0);
+
+            _initializedLobbies.add(lobby);
         }
 
         if(_availableTasks.get(lobby).stream().noneMatch(task -> task.getId() == taskID)){
             if(taskType.equals("Connecting Wires")) {
                 _availableTasks.get(lobby).add(new TaskConnectingWires(taskID));
+                System.out.println("Added Task Connecting Wires: " + taskID);
             }else if(taskType.equals("File Upload") || taskType.equals("File Download")){
                 _availableTasks.get(lobby).add(new TaskFileDownloadUpload(taskID));
+                System.out.println("Added Task File Upload/Download: " + taskID);
             }
         }
     }
 
+    public boolean lobbyExists(String lobbyId){
+        return _initializedLobbies.contains(lobbyId);
+    }
+
     public void startTask(String lobby, int taskId, String player){
-        for(Task taskObj :  _availableTasks.get(lobby)){
-            if(taskObj.getId() == taskId){
+        Iterator<Task> iterator = _availableTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
+            if (taskObj.getId() == taskId) {
                 taskObj.setPlayer(player);
                 System.out.println(taskObj.getPlayer());
-                _availableTasks.get(lobby).remove(taskObj);
+                iterator.remove();
                 _activeTasks.get(lobby).add(taskObj);
-                System.out.println("started Task: " + taskId);
+                System.out.println("Started Task: " + taskId);
                 break;
             }
         }
@@ -74,9 +78,12 @@ public class TasksHandler {
     }
 
     public void finishTask(String lobby, int id){
-        for(Task taskObj : _activeTasks.get(lobby)){
-            if(taskObj.getId() == id){
-                _activeTasks.get(lobby).remove(taskObj);
+        Iterator<Task> iterator = _activeTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
+            if (taskObj.getId() == id) {
+                System.out.println("Finish task: " + id);
+                iterator.remove();
                 _finishedTasks.put(lobby, _finishedTasks.get(lobby) + 1);
                 break;
             }
@@ -85,24 +92,27 @@ public class TasksHandler {
 
     public void cancelTask(String lobby, int id){
         System.out.println("Cancel task: " + id);
-        for(Task taskObj : _activeTasks.get(lobby)) {
+        Iterator<Task> iterator = _activeTasks.get(lobby).iterator();
+        while (iterator.hasNext()) {
+            Task taskObj = iterator.next();
             if (taskObj.getId() == id) {
                 System.out.println("Success");
                 taskObj.reset();
-                _activeTasks.get(lobby).remove(taskObj);
+                iterator.remove();
                 _availableTasks.get(lobby).add(taskObj);
                 break;
             }
         }
     }
 
-    public boolean taskCompleted(String lobby, String player){
+    public boolean taskCompleted(String lobby, int id){
         for(Task task : _activeTasks.get(lobby)){
-            if(task.getPlayer().equals(player) && task.taskCompleted()){
+            if(task.getId() == id && task.taskCompleted()){
+                System.out.println("Task completed: " + id);
                 return true;
             }
         }
-
+        System.out.println("Task not completed: " + id);
         return false;
     }
 

@@ -29,11 +29,12 @@ public class MoveRequest {
     public String getName() {
         return _name;
     }
-    public String getGameId() {
-        return _gameId;
-    }
 
     public void setName(String name) {
         _name = name;
+    }
+
+    public String getGameId() {
+        return _gameId;
     }
 }

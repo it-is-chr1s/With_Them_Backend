@@ -17,7 +17,7 @@ public class ChangeColorRequest {
         return _color;
     }
 
-    public void set_color(Colors _color) {
+    public void setColor(Colors _color) {
         this._color = _color;
     }
 
@@ -33,7 +33,7 @@ public class ChangeColorRequest {
     }
 
     @JsonCreator
-    public ChangeColorRequest(String gameId,String name, String color) {
+    public ChangeColorRequest(String gameId, String name, String color) {
         _gameId=gameId;
         _name = name;
         _color = Colors.fromHex(color);

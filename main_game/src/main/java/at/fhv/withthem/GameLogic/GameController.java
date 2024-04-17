@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@Controller
 public class GameController {
 
     private final GameService gameService;
@@ -31,6 +30,8 @@ public class GameController {
     public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
         // Call the method to register a new game
         String gameId = gameService.registerGame(requestBody.get("hostName"));
+
+        loadTasks(gameId, gameService.getTaskPositions(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -72,10 +73,10 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId,playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
         }
 
-        gameService.updatePlayerDirection(gameId,playerName, direction);
+        gameService.updatePlayerDirection(gameId, playerName, direction);
     }
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {
@@ -83,8 +84,8 @@ public class GameController {
         String playerName = colorRequest.getName();
         Colors color = colorRequest.getColor();
 
-        if (!gameService.playerExists(gameId,playerName)) {
-            gameService.registerPlayer(gameId,playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+        if (!gameService.playerExists(gameId, playerName)) {
+            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
         }
 
         gameService.updatePlayerColor(gameId, playerName, color);
@@ -93,7 +94,7 @@ public class GameController {
     public void sendMapLayout(MapRequest mapRequest) {
         String gameId = mapRequest.getGameId();
         List<Position> wallPositions = gameService.getWallPositions(gameId);
-        List<TaskPosition> taskPositions = gameService.getTaskPositions();//TODO:provide gameId
+        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);//TODO:provide gameId
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
@@ -103,13 +104,17 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
 
-    public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) throws JsonProcessingException {
+    public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) {
         List<InitTaskMessage> initTaskMessages = new ArrayList<>();
         for (TaskPosition taskPosition : taskPositions) {
             initTaskMessages.add(new InitTaskMessage(lobbyID, taskPosition.getTaskType(), taskPosition.getId()));
         }
         ObjectMapper mapper = new ObjectMapper();
-        System.out.println(mapper.writeValueAsString(initTaskMessages));
+        try {
+            System.out.println(mapper.writeValueAsString(initTaskMessages));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         //messagingTemplate.convertAndSend("/tasks/loadAvailableTasks", initTaskMessages);
 
         String url = "http://localhost:4001/loadAvailableTasks";

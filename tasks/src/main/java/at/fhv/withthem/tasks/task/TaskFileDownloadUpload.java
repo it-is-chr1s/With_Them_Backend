@@ -8,7 +8,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class TaskFileDownloadUpload extends Task{
-    //private final float speed = 1.0f;
     private String _state;
     private float _progress;
     private boolean _running;
