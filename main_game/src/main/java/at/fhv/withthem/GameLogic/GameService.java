@@ -33,7 +33,7 @@ public class GameService {
         Player player = players.get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
         }
     }
 
@@ -47,10 +47,11 @@ public class GameService {
 
                 Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-                if (canMoveTo(newPosition)) {
-                    player.setPosition(newPosition);
-                    messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(id, newPosition, player.getColor().getHexValue()));
-                    messagingTemplate.convertAndSend("/topic/player/" + id + "/controlsEnabled/task", canDoTask(player.getPosition()));
+                    if (canMoveTo(gameId, newPosition)) {
+                        player.setPosition(newPosition);
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                    }
                 }
             }
         });
@@ -96,11 +97,22 @@ public class GameService {
         players.put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         // TODO: loop through all players here to draw them all
-        messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
+        messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
 
     }
-
-    public List<Position> getWallPositions() {
+    public String registerGame(String hostName) {
+        String gameId=generateGameId();
+        GameMap map=new GameMap(); //TODO:how to create/find/get map???
+        games.put(gameId, new Game(gameId, map, hostName));
+        return gameId;
+    }
+    private String generateGameId() {
+        // unique game ID
+        //TODO:find better method
+        return UUID.randomUUID().toString();
+    }
+    public List<Position> getWallPositions(String gameId) {
+        GameMap map =getMap(gameId);
         List<Position> wallPositions = new ArrayList<>();
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {

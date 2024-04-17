@@ -1,6 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
 import at.fhv.withthem.GameLogic.Requests.ChangeColorRequest;
+import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -23,6 +28,13 @@ public class GameController {
 
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/createGame")
+    public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
+        // Call the method to register a new game
+        String gameId = gameService.registerGame(requestBody.get("hostName"));
+        return new ResponseEntity<>(gameId, HttpStatus.OK);
+    }
 
     @Autowired
     public GameController(GameService gameService, SimpMessagingTemplate messagingTemplate) {
@@ -78,16 +90,17 @@ public class GameController {
         gameService.updatePlayerColor(playerName, color);
     }
     @MessageMapping("/requestMap")
-    public void sendMapLayout() {
-        List<Position> wallPositions = gameService.getWallPositions();
-        List<TaskPosition> taskPositions = gameService.getTaskPositions();
+    public void sendMapLayout(MapRequest mapRequest) {
+        String gameId = mapRequest.getGameId();
+        List<Position> wallPositions = gameService.getWallPositions(gameId);
+        List<TaskPosition> taskPositions = gameService.getTaskPositions();//TODO:provide gameId
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
         mapLayout.put("width", gameService.getMap().getWidth());
         mapLayout.put("height", gameService.getMap().getHeight());
 
-        messagingTemplate.convertAndSend("/topic/mapLayout", mapLayout);
+        messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
 
     public void loadTasks(String lobbyID, List<TaskPosition> taskPositions) throws JsonProcessingException {
