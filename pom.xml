@@ -17,6 +17,7 @@
     <modules>
         <module>tasks</module>
 		<module>main_game</module>
+		<module>roles</module>
 	</modules>
     <properties>
 		<java.version>17</java.version>
