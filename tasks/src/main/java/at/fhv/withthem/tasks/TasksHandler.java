@@ -10,10 +10,6 @@ import java.util.*;
 
 @Component
 public class TasksHandler {
-    /*private final List<Task> _possibleTasks = new ArrayList<>(Arrays.asList(
-            new TaskConnectingWires(),
-            new TaskFileDownloadUpload()
-    ));*/
     private final HashMap<String, List<Task>> _availableTasks = new HashMap<>();
     private final HashMap<String, List<Task>> _activeTasks = new HashMap<>();
     private final HashMap<String, Integer> _finishedTasks = new HashMap<>();

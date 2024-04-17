@@ -40,12 +40,6 @@ public class TasksController {
         System.out.println(mapper.writeValueAsString(_tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby())));
         stateOfTasks(initTaskMessages.get(0).getLobby());
     }
-/*
-    @MessageMapping("tasks/requestAvailableTasks")
-    public void sendAvailableTasks(@Payload String lobbyID) {
-        System.out.println("Available tasks requested for lobby: " + lobbyID);
-        _messagingTemplate.convertAndSend("/topic/tasks/availableTasks", _tasksHandler.getAvailableTasks(lobbyID));
-    }*/
 
     @MessageMapping("tasks/requestStateOfTasks")
     public void stateOfTasks(@Payload String lobbyID) {
@@ -57,7 +51,7 @@ public class TasksController {
             tasks.put(taskMessage.getId(), "active");
         }
 
-        _messagingTemplate.convertAndSend("/topic/tasks/stateOfTasks", tasks);
+        _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/stateOfTasks", tasks);
     }
 
     @MessageMapping("tasks/startTask")
@@ -70,7 +64,7 @@ public class TasksController {
         }
         _tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getId(), taskMessage.getPlayer());
         stateOfTasks(taskMessage.getLobby());
-        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+        _messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
     }
 
     @MessageMapping("/tasks/playerAction")
@@ -84,14 +78,9 @@ public class TasksController {
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
-                _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+                _messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
             }
         });
-    }
-
-    @MessageMapping("/availableTasks")
-    public void getAvailableTasks(@Payload String lobbyID){
-        System.out.println("Available tasks requested for lobby: " + _tasksHandler.getAvailableTasks(lobbyID).toString());
     }
 
     @MessageMapping("tasks/closeTask")
@@ -109,10 +98,8 @@ public class TasksController {
         }
 
         stateOfTasks(taskMessage.getLobby());
-        _messagingTemplate.convertAndSend("/topic/tasks/currentTask/" + taskMessage.getPlayer(), "");
+        _messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), "");
     }
-
-    //publish available tasks to the lobby
 
 
 }
