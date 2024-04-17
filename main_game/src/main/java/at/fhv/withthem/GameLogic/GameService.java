@@ -7,30 +7,26 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    @Autowired
-    private final GameMap map;
-    private final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Game> games = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-    public GameService(GameMap map) {
-        this.map = map;
-    }
-
-    public synchronized void updatePlayerDirection(String playerId, Direction direction) {
-        Player player = players.get(playerId);
+    public synchronized void updatePlayerDirection(String gameId, String playerId, Direction direction) {
+        Player player = getPlayers(gameId).get(playerId);
         if (player != null) {
             player.setDirection(direction);
             player.setHasMoved(!direction.equals(Direction.NONE));
         }
     }
-    public synchronized void updatePlayerColor(String playerId, Colors colors) {
-        Player player = players.get(playerId);
+
+    public synchronized void updatePlayerColor(String gameId, String playerId, Colors colors) {
+        Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
             messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
@@ -39,13 +35,15 @@ public class GameService {
 
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
-        players.forEach((id, player) -> {
-            if (player.hasMoved()) {
-                Position currentPosition = player.getPosition();
-                Direction direction = player.getDirection();
-                float speed = 0.01f;
+        games.forEach((gameId, game) -> {
+            ConcurrentHashMap<String, Player> players = game.getPlayers();
+            players.forEach((playerId, player) -> {
+                if (player.hasMoved()) {
+                    Position currentPosition = player.getPosition();
+                    Direction direction = player.getDirection();
+                    float speed = 0.01f;
 
-                Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+                    Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
                     if (canMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
@@ -53,30 +51,31 @@ public class GameService {
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                     }
                 }
-            }
+            });
         });
     }
 
-    public synchronized boolean movePlayer(String playerId, Direction direction, float speed) {
-        Player player = players.get(playerId);
+    public synchronized boolean movePlayer(String gameId, String playerId, Direction direction, float speed) {
+        Player player = getPlayers(gameId).get(playerId);
         Position currentPosition = player.getPosition();
 
         Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-        if (canMoveTo(newPosition)) {
+        if (canMoveTo(gameId, newPosition)) {
             player.setPosition(newPosition);
             return true;
         }
         return false;
     }
 
-    private boolean canMoveTo(Position position) {
+    private boolean canMoveTo(String gameId, Position position) {
+        GameMap map =getMap(gameId);
         return map.isWithinBounds((int)position.getX(), (int)position.getY())
                 && !map.isWall((int)position.getX(), (int)position.getY());
     }
 
-    private boolean canDoTask(Position position){
-        return map.isTask((int)position.getX(), (int)position.getY());
+    private boolean canDoTask(String gameId, Position position){
+        return getMap(gameId).isTask((int)position.getX(), (int)position.getY());
     }
 
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
@@ -85,32 +84,39 @@ public class GameService {
         return new Position(newX, newY);
     }
 
-    public Player getPlayer(String playerId) {
-        return players.get(playerId);
+    public Player getPlayer(String gameId,String playerId) {
+        return getPlayers(gameId).get(playerId);
     }
 
-    public boolean playerExists(String playerId) {
-        return players.containsKey(playerId);
+    public ConcurrentHashMap<String, Player> getPlayers(String gameId){
+        return getGame(gameId).getPlayers();
     }
 
-    public void registerPlayer(String playerId, Position startPosition, Colors color) {
-        players.put(playerId, new Player(playerId, startPosition, color));
+    public boolean playerExists(String gameId, String playerId) {
+        return getPlayers(gameId).containsKey(playerId);
+    }
+
+    public void registerPlayer(String gameID, String playerId, Position startPosition, Colors color) {
+        getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         // TODO: loop through all players here to draw them all
         messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
 
     }
+
     public String registerGame(String hostName) {
         String gameId=generateGameId();
         GameMap map=new GameMap(); //TODO:how to create/find/get map???
         games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
+
     private String generateGameId() {
         // unique game ID
         //TODO:find better method
         return UUID.randomUUID().toString();
     }
+
     public List<Position> getWallPositions(String gameId) {
         GameMap map =getMap(gameId);
         List<Position> wallPositions = new ArrayList<>();
@@ -125,6 +131,7 @@ public class GameService {
     }
 
     public List<TaskPosition> getTaskPositions(){
+        GameMap map =new GameMap();//TODO:???
         List<TaskPosition> taskPositions = new ArrayList<>();
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
@@ -136,7 +143,10 @@ public class GameService {
         return taskPositions;
     }
 
-    public GameMap getMap() {
-        return map;
+    public Game getGame(String gameId) {
+        return games.get(gameId);
+    }
+    public GameMap getMap(String gameId) {
+        return getGame(gameId).getMap();
     }
 }

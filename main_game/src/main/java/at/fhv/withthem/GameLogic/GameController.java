@@ -6,16 +6,13 @@ import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -69,25 +66,27 @@ public class GameController {
     */
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
+        String gameId=moveRequest.getGameId();
         String playerName = moveRequest.getName();
         Direction direction = moveRequest.getDirection();
 
-        if (!gameService.playerExists(playerName)) {
-            gameService.registerPlayer(playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+        if (!gameService.playerExists(gameId, playerName)) {
+            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
         }
 
-        gameService.updatePlayerDirection(playerName, direction);
+        gameService.updatePlayerDirection(gameId, playerName, direction);
     }
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {
-        String playerName = colorRequest.get_name();
-        Colors color = colorRequest.get_color();
+        String gameId=colorRequest.getGameId();
+        String playerName = colorRequest.getName();
+        Colors color = colorRequest.getColor();
 
-        if (!gameService.playerExists(playerName)) {
-            gameService.registerPlayer(playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+        if (!gameService.playerExists(gameId, playerName)) {
+            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
         }
 
-        gameService.updatePlayerColor(playerName, color);
+        gameService.updatePlayerColor(gameId, playerName, color);
     }
     @MessageMapping("/requestMap")
     public void sendMapLayout(MapRequest mapRequest) {
@@ -97,8 +96,8 @@ public class GameController {
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
-        mapLayout.put("width", gameService.getMap().getWidth());
-        mapLayout.put("height", gameService.getMap().getHeight());
+        mapLayout.put("width", gameService.getMap(gameId).getWidth());
+        mapLayout.put("height", gameService.getMap(gameId).getHeight());
 
         messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
