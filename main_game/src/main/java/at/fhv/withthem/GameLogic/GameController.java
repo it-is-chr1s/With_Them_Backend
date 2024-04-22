@@ -26,7 +26,6 @@ public class GameController {
 
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
-    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/createGame")
     public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
         // Call the method to register a new game
@@ -36,7 +35,6 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
