@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@CrossOrigin(origins = "http://localhost:5174")
 public class GameController {
 
     private final GameService gameService;
