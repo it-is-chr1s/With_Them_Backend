@@ -5,10 +5,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 public class GameService {
@@ -148,5 +148,41 @@ public class GameService {
     }
     public GameMap getMap(String gameId) {
         return getGame(gameId).getMap();
+    }
+
+    public boolean killPlayer(String gameId, String playerId) {;
+
+        return true;
+    }
+
+    public boolean isAlive(String gameId, String payerId) {
+        return games.get(gameId).getPlayers().get(payerId).isAlive();
+    }
+
+    public boolean isCrewmate(String gameId, String payerId) {
+
+        return true; //TODO:check if player is Crewmate and return it
+    }
+
+    public void startGame(String gameId) {
+        System.out.println(gameId);
+        System.out.println(getGame(gameId));
+        Settings gameSettings = getGame(gameId).getSettings();
+        Set<String> playerKeys = getGame(gameId).getPlayers().keySet();
+        HashMap<Integer, Integer> roles = gameSettings .getRoles();
+        for(Integer key : roles.keySet()) {
+             int i = 0;
+            while(i < roles.get(key)) {
+                int randomId = new Random().nextInt(playerKeys.size());
+                String randomKey = playerKeys.toArray()[randomId].toString();
+                if(getGame(gameId).getPlayers().get(randomKey).getRole() == 0) {
+                    getGame(gameId).getPlayers().get(randomKey).setRole(key);
+                    playerKeys.remove(randomKey);
+                    i++;
+                    messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + randomKey, key);
+                }
+            }
+        }
+        getGame(gameId).setRunning(true);
     }
 }

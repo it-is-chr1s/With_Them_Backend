@@ -8,12 +8,35 @@ public class Game {
     private GameMap _map;
     private ConcurrentHashMap<String, Player> _players = new ConcurrentHashMap<>();
 
+    private Settings _settings;
+
+    private boolean _isRunning;
+
     public Game(String gameId, GameMap map, String host){
         _gameId=gameId;
         this._map =map;
         _host=new Player(host,new Position(1,1),Colors.BLUE);
         _players.put(host, _host);
+        _settings=new Settings();
+        _isRunning=false;
     }
+
+    public boolean isRunning() {
+        return _isRunning;
+    }
+
+    public void setRunning(boolean running) {
+        _isRunning = running;
+    }
+
+    public Settings getSettings() {
+        return _settings;
+    }
+
+    public void setSettings(Settings settings) {
+        _settings = settings;
+    }
+
     public ConcurrentHashMap<String, Player> getPlayers() {
         return _players;
     }

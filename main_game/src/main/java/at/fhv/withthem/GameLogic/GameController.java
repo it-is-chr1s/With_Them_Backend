@@ -31,8 +31,15 @@ public class GameController {
     public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
         // Call the method to register a new game
         String gameId = gameService.registerGame(requestBody.get("hostName"));
-
+        System.out.println(gameId);
         loadTasks(gameId, gameService.getTaskPositions(gameId));
+        return new ResponseEntity<>(gameId, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/startGame")
+    public ResponseEntity<String> startGame(@RequestBody String gameId) {
+        gameService.startGame(gameId);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -78,6 +85,21 @@ public class GameController {
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
+    }
+
+    @MessageMapping("/kill")
+    public int killPlayer(String gameId, String payerId) {
+        if(!gameService.playerExists(gameId, payerId)) {
+            return -1;
+        }
+        if(!gameService.isAlive(gameId, payerId)) {
+            return -1;
+        }
+        if(!gameService.isCrewmate(gameId, payerId)) {
+            gameService.killPlayer(gameId, payerId);
+            return 1;
+        }
+        return -1;
     }
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {

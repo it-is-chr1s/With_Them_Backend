@@ -7,6 +7,10 @@ public class Player {
     private Colors _color;
     private Position _position;
     private Direction _direction;
+
+    private int _role = 0;
+
+    private boolean _isAlive = true;
     private boolean _hasMoved = false;
     public Player(String id, Position position, Colors color) {
         this._id = id;
@@ -14,6 +18,12 @@ public class Player {
         this._direction = Direction.NONE;
         this._color=color;
     }
+
+    public int getRole() {return _role;}
+    public void setRole(int role) {_role = role;}
+
+    public boolean isAlive() {return _isAlive;}
+    public void kill() {_isAlive = false;}
 
     public String getId() {
         return _id;
