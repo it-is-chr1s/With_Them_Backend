@@ -50,6 +50,7 @@ public class GameService {
                         player.setPosition(newPosition);
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
                     }
                 }
             });
@@ -79,6 +80,9 @@ public class GameService {
         return getMap(gameId).isTask((int)position.getX(), (int)position.getY());
     }
 
+    private boolean canCallEmergencyMeeting(String gameId, Position position){
+        return getMap(gameId).isMeetingPoint((int)position.getX(),(int)position.getY());
+    }
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
         float newX = currentPosition.getX() + direction.getDx() * speed;
         float newY = currentPosition.getY() + direction.getDy() * speed;
