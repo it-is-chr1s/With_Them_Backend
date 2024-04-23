@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.Console;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -128,6 +129,20 @@ public class GameService {
             }
         }
         return wallPositions;
+    }
+    public Position getMeetingPositions(String gameId) {
+        GameMap map =getMap(gameId);
+        Position meetingPosition=new Position(-1,-1);
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isMeetingPoint(x, y)) {
+                    meetingPosition=new Position(x,y);
+                }
+            }
+        }
+        if(meetingPosition.getX()==-1)
+            System.out.println("IS MEETING POINT IN MAP DOES NOT WORK");
+        return meetingPosition;
     }
 
     public List<TaskPosition> getTaskPositions(String gameId){

@@ -7,7 +7,7 @@ public class GameMap {
     private final String[][] _grid;
     private final int _height = 20;
     private final int _width = 40;
-    //TODO: Constructor without parameters = lobby
+    //TODO: Constructor for lobby
     public GameMap() {
         this._grid = new String[_height][_width];
 
@@ -31,6 +31,7 @@ public class GameMap {
         setWall(5, 9);
         setWall(5, 8);
 
+        setMeetingPoint(15, 3);
         //type should not include String %id
         setTask(7, 7, "Connecting Wires", 1);
         setTask(11, 5, "File Download", 2);
@@ -46,13 +47,16 @@ public class GameMap {
     }
 
     public boolean isTask(int x, int y){
-        return (_grid[y][x] != null && !_grid[y][x].equals("Wall"));
+        return (_grid[y][x] != null && !_grid[y][x].equals("Wall")&& !_grid[y][x].equals("Meeting"));
     }
 
     public String getContent(int x, int y) {
         return _grid[y][x];
     }
 
+    public void setMeetingPoint(int x, int y) {
+        _grid[y][x] = "Meeting";
+    }
 
     public void setWall(int x, int y) {
         _grid[y][x] = "Wall";
@@ -60,6 +64,9 @@ public class GameMap {
 
     public boolean isWall(int x, int y) {
         return (_grid[y][x] != null && _grid[y][x].equals("Wall"));
+    }
+    public boolean isMeetingPoint(int x, int y) {
+        return (_grid[y][x] != null && _grid[y][x].equals("Meeting"));
     }
 
     public boolean isWithinBounds(int x, int y) {

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 public class GameController {
 
     private final GameService gameService;
@@ -115,10 +115,12 @@ public class GameController {
     public void sendMapLayout(MapRequest mapRequest) {
         String gameId = mapRequest.getGameId();
         List<Position> wallPositions = gameService.getWallPositions(gameId);
-        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);//TODO:provide gameId
+        Position meetingPosition = gameService.getMeetingPositions(gameId);
+        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
+        mapLayout.put("meetingPosition", meetingPosition);
         mapLayout.put("width", gameService.getMap(gameId).getWidth());
         mapLayout.put("height", gameService.getMap(gameId).getHeight());
 
