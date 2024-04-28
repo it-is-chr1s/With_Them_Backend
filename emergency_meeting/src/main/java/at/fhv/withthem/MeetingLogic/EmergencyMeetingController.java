@@ -38,6 +38,7 @@ public class EmergencyMeetingController {
         }
     }
 
+
   /*  @MessageMapping("meeting/requestStateOfPlayers")
     public void stateOfPlayers(@Payload String lobbyID) {
         System.out.println("requestStateOfTasks for " + lobbyID);
