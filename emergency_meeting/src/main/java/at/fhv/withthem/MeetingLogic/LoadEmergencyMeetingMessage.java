@@ -1,25 +1,29 @@
 package at.fhv.withthem.MeetingLogic;
 
+import java.util.List;
+
 public class LoadEmergencyMeetingMessage {
     private String _gameId;
-    private String _name;
-    private boolean _isAlive;
+    private List<String> _names;
 
-    public LoadEmergencyMeetingMessage(String gameId, String name, boolean live) {
+    public LoadEmergencyMeetingMessage(String gameId, List<String> names) {
         _gameId = gameId;
-        _name = name;
-        _isAlive = live;
+        _names = names;
     }
 
-    public String getGameId() {
+    public String get_gameId() {
         return _gameId;
     }
 
-    public String getName() {
-        return _name;
+    public void set_gameId(String _gameId) {
+        this._gameId = _gameId;
     }
 
-    public boolean getIsAlive() {
-        return _isAlive;
+    public List<String> get_names() {
+        return _names;
+    }
+
+    public void set_names(List<String> _names) {
+        this._names = _names;
     }
 }

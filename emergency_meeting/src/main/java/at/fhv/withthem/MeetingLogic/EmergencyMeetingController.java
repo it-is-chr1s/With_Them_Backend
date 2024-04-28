@@ -1,6 +1,5 @@
 package at.fhv.withthem.MeetingLogic;
 
-import at.fhv.withthem.MeetingLogic.task.Reaction;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.List;
-
 @Controller
 @RestController
 public class EmergencyMeetingController {
@@ -30,20 +27,18 @@ public class EmergencyMeetingController {
     }
 
     @PostMapping("/loadEmergencyMeeting")
-    public void loadLobby(@RequestBody List<LoadEmergencyMeetingMessage> loadEmergencyMeetingMessages) throws JsonProcessingException {
-        System.out.println(loadEmergencyMeetingMessages.get(0).getGameId());
-        //if (!_emergencyMeetingHandler.lobbyExists(loadEmergencyMeetingMessages.get(0).getGameId())) {
-            ObjectMapper mapper = new ObjectMapper();
-            for (LoadEmergencyMeetingMessage loadEmergencyMeetingMessage : loadEmergencyMeetingMessages) {
-                //_emergencyMeetingHandler.addTaskToLobby(loadEmergencyMeetingMessage.getGameId(), loadEmergencyMeetingMessage.getType(), loadEmergencyMeetingMessage.getId());
-            }
+    public void loadLobby(@RequestBody LoadEmergencyMeetingMessage loadEmergencyMeetingMessage) throws JsonProcessingException {
 
-            System.out.println(mapper.writeValueAsString(_emergencyMeetingHandler.getAvailableTasks(loadEmergencyMeetingMessages.get(0).getGameId())));
-            stateOfPlayers(loadEmergencyMeetingMessages.get(0).getGameId());
+        if(!_emergencyMeetingHandler.meetingExists(loadEmergencyMeetingMessage.get_gameId())){
+            _emergencyMeetingHandler.createMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+        }
+        else
+        {
+            _emergencyMeetingHandler.updateMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
         }
     }
 
-    @MessageMapping("meeting/requestStateOfPlayers")
+  /*  @MessageMapping("meeting/requestStateOfPlayers")
     public void stateOfPlayers(@Payload String lobbyID) {
         System.out.println("requestStateOfTasks for " + lobbyID);
 
@@ -68,7 +63,7 @@ public class EmergencyMeetingController {
     @MessageMapping("meeting/start")
     public void startTask(EmergencyMeetingMessage emergencyMeetingMessage) {
 
-      /*  ObjectMapper mapper = new ObjectMapper();
+       ObjectMapper mapper = new ObjectMapper();
         try {
             System.out.println("Task started: " + mapper.writeValueAsString(emergencyMeetingMessage));
         } catch (JsonProcessingException e) {
@@ -77,7 +72,7 @@ public class EmergencyMeetingController {
         _emergencyMeetingHandler.startTask(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getId(), emergencyMeetingMessage.getPlayer());
         stateOfPlayers(emergencyMeetingMessage.getLobby());
         _messagingTemplate.convertAndSend("/topic/meeting/" + emergencyMeetingMessage.getLobby() + "/currentTask/" + emergencyMeetingMessage.getPlayer(), _emergencyMeetingHandler.getCurrentState(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getPlayer()));
-    */}
+    }
 
     @MessageMapping("/meeting/playerAction")
     public void playerAction(EmergencyMeetingMessage emergencyMeetingMessage) {
@@ -112,6 +107,6 @@ public class EmergencyMeetingController {
         stateOfPlayers(emergencyMeetingMessage.getLobby());
         _messagingTemplate.convertAndSend("/topic/meeting/" + emergencyMeetingMessage.getLobby() + "/currentTask/" + emergencyMeetingMessage.getPlayer(), "");
     }
-
+*/
 
 }

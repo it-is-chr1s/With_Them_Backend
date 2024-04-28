@@ -1,10 +1,9 @@
 package at.fhv.withthem.MeetingLogic;
 
-import at.fhv.withthem.MeetingLogic.task.IncomingConnectingWiresMessage;
-import at.fhv.withthem.MeetingLogic.task.IncomingFileDownloadUploadMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.util.List;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -12,61 +11,29 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type",
         defaultImpl = EmergencyMeetingMessage.class
 )
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires"),
-        @JsonSubTypes.Type(value = IncomingFileDownloadUploadMessage.class, name = "incomingFileDownloadUpload")
-})
 public class EmergencyMeetingMessage {
-    private String _lobby;
-    private String _task;
-    private String _player;
-    private int _id;
+    private String _gameId;
+    private List<String>_names;
 
     @JsonCreator
-    public EmergencyMeetingMessage(String lobby, String task, String player) {
-        _lobby = lobby;
-        _task = task;
-        _player = player;
+    public EmergencyMeetingMessage(String lobby, List<String>names) {
+        _gameId = lobby;
+        _names = names;
     }
 
-    public EmergencyMeetingMessage(String task, int id) {
-        _task = task;
-        _id = id;
+    public String get_gameId() {
+        return _gameId;
     }
 
-    public EmergencyMeetingMessage(String task) {
-        _task = task;
+    public void set_gameId(String _gameId) {
+        this._gameId = _gameId;
     }
 
-    public String getLobby() {
-        return _lobby;
+    public List<String> get_names() {
+        return _names;
     }
 
-    public void setLobby(String _lobby) {
-        this._lobby = _lobby;
-    }
-
-    public String getTask() {
-        return _task;
-    }
-
-    public void setTask(String _task) {
-        this._task = _task;
-    }
-
-    public String getPlayer() {
-        return _player;
-    }
-
-    public void setPlayer(String _player) {
-        this._player = _player;
-    }
-
-    public int getId() {
-        return _id;
-    }
-
-    public void setId(int id) {
-        _id = id;
+    public void set_names(List<String> _names) {
+        this._names = _names;
     }
 }

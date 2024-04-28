@@ -8,14 +8,14 @@ public class EmergencyMeeting {
     private boolean _startable;
     private boolean _isRunning;
     private int _coolDownTime;
-    private List<String> _allAlivePlayers;
+    private List<String> _alivePlayers;
     private int _Votes;
 
     public EmergencyMeeting(String gameId, List<String>playerNames){
         _startable=true;
         _isRunning=false;
         _gameId=gameId;
-        _allAlivePlayers=playerNames;
+        _alivePlayers =playerNames;
     }
 
     public String getGameId() {
@@ -34,19 +34,17 @@ public class EmergencyMeeting {
         this._startable = _startable;
     }
 
-    public boolean getIsRunning() {
-        return _isRunning;
-    }
+    public boolean getIsRunning() {return _isRunning; }
 
     public void setIsRunning(boolean _isRunning) {
         this._isRunning = _isRunning;
     }
 
-    public List<String> getAllAlivePlayers() {
-        return _allAlivePlayers;
+    public List<String> getAlivePlayers() {
+        return _alivePlayers;
     }
 
-    public void setAllAlivePlayers(List<String> _allAlivePlayers) {
-        this._allAlivePlayers = _allAlivePlayers;
+    public void setAlivePlayers(List<String> _allAlivePlayers) {
+        this._alivePlayers = _allAlivePlayers;
     }
 }

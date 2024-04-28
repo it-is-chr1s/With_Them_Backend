@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:5173")
@@ -30,6 +28,7 @@ public class GameController {
         String gameId = gameService.registerGame(requestBody.get("hostName"));
         System.out.println(gameId);
         loadTasks(gameId, gameService.getTaskPositions(gameId));
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -147,23 +146,25 @@ public class GameController {
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
 
-    public void loadEmergencyMeeting(String gameId, List<Player> players){
-        List<LoadEmergencyMeetingMessage> loadEmergencyMeetingMessages = new ArrayList<>();
-        for (Player player : players) {
-            loadEmergencyMeetingMessages.add(new LoadEmergencyMeetingMessage(gameId, player.getId(), player.isAlive()));
+    public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
+        List<String>alivePlayers=new LinkedList<>();
+        for (Player player : players.values()) {
+            if(player.isAlive())
+                alivePlayers.add(player.getName());
         }
+        LoadEmergencyMeetingMessage loadEmergencyMeetingMessages=new LoadEmergencyMeetingMessage(gameId,alivePlayers);
         ObjectMapper mapper = new ObjectMapper();
         try {
             System.out.println(mapper.writeValueAsString(loadEmergencyMeetingMessages));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        String url = "http://localhost:4003/loadAvailableTasks";
+        String url = "http://localhost:4003/loadEmergencyMeeting";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<List<LoadEmergencyMeetingMessage>> requestEntity = new HttpEntity<>(loadEmergencyMeetingMessages, headers);
+        HttpEntity<LoadEmergencyMeetingMessage> requestEntity = new HttpEntity<>(loadEmergencyMeetingMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
 }
