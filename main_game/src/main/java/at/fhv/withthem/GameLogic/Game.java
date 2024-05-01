@@ -48,4 +48,7 @@ public class Game {
         return _map;
     }
 
+    public String getHost() {
+        return _host.getName();
+    }
 }

@@ -5,14 +5,13 @@ import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.catalina.Host;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -23,10 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameController {
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
-    @PostMapping("/createGame")
-    public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
-        String gameId = gameService.registerGame(requestBody.get("hostName"));
-        System.out.println(gameId);
+
+    @RequestMapping(method= RequestMethod.POST, value="/createGame")
+    public ResponseEntity<String> createGame(@RequestParam("hostName") String requestBody) {
+    //@PostMapping("/createGame")
+    //public ResponseEntity<String> createGame(@RequestBody HostNameRequest requestBody) {
+        System.out.println(requestBody);
+        String gameId = gameService.registerGame(requestBody);
+        System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
         loadTasks(gameId, gameService.getTaskPositions(gameId));
         loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
@@ -77,6 +80,7 @@ public class GameController {
 
         if (!gameService.playerExists(gameId, playerName)) {
             gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);
+            loadEmergencyMeeting("In MOVE"+gameId,gameService.getPlayers(gameId));
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
@@ -148,14 +152,17 @@ public class GameController {
 
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
         List<String>alivePlayers=new LinkedList<>();
-        for (Player player : players.values()) {
-            if(player.isAlive())
+        System.out.println("Igraci:"+ players.get("s").getName());
+        players.forEach((playerId, player) -> {
+            if(player.isAlive()){
+
+            }
                 alivePlayers.add(player.getName());
-        }
+        });
         LoadEmergencyMeetingMessage loadEmergencyMeetingMessages=new LoadEmergencyMeetingMessage(gameId,alivePlayers);
         ObjectMapper mapper = new ObjectMapper();
         try {
-            System.out.println(mapper.writeValueAsString(loadEmergencyMeetingMessages));
+            System.out.println("PORUKA:"+mapper.writeValueAsString(loadEmergencyMeetingMessages));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
