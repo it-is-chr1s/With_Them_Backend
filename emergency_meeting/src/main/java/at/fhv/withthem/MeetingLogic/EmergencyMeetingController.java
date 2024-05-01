@@ -37,7 +37,27 @@ public class EmergencyMeetingController {
             _emergencyMeetingHandler.updateMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
         }
     }
+    @MessageMapping("meeting/requestStartable")
+    public void stateOfTasks(@Payload String gameId) {
+        System.out.println("Startable for " + gameId);
 
+        HashMap<Integer, String> tasks = new HashMap<>();
+        for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(gameId)){
+            tasks.put(taskMessage.getId(), "available");
+        }
+        for (TaskMessage taskMessage : _tasksHandler.getActiveTasks(gameId)){
+            tasks.put(taskMessage.getId(), "active");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println(mapper.writeValueAsString(tasks));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", tasks);
+    }
 
   /*  @MessageMapping("meeting/requestStateOfPlayers")
     public void stateOfPlayers(@Payload String lobbyID) {

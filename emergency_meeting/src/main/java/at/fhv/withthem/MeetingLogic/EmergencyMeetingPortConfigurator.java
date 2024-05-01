@@ -9,7 +9,7 @@ public class EmergencyMeetingPortConfigurator implements WebServerFactoryCustomi
 
     @Override
     public void customize(ConfigurableWebServerFactory factory) {
-        factory.setPort(4003);
+        factory.setPort(4002);
     }
 }
 

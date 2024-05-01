@@ -167,7 +167,7 @@ public class GameController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        String url = "http://localhost:4003/loadEmergencyMeeting";
+        String url = "http://localhost:4002/loadEmergencyMeeting";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
