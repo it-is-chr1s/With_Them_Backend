@@ -30,8 +30,10 @@ public class GameController {
         System.out.println(requestBody);
         String gameId = gameService.registerGame(requestBody);
         System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
+
         loadTasks(gameId, gameService.getTaskPositions(gameId));
         loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -152,17 +154,16 @@ public class GameController {
 
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
         List<String>alivePlayers=new LinkedList<>();
-        System.out.println("Igraci:"+ players.get("s").getName());
         players.forEach((playerId, player) -> {
+            System.out.println("Players:"+ player.getName());
             if(player.isAlive()){
-
-            }
                 alivePlayers.add(player.getName());
+            }
         });
         LoadEmergencyMeetingMessage loadEmergencyMeetingMessages=new LoadEmergencyMeetingMessage(gameId,alivePlayers);
         ObjectMapper mapper = new ObjectMapper();
         try {
-            System.out.println("PORUKA:"+mapper.writeValueAsString(loadEmergencyMeetingMessages));
+            System.out.println("Message to EmergencyMeeting:"+mapper.writeValueAsString(loadEmergencyMeetingMessages));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
