@@ -25,8 +25,8 @@ public class GameController {
 
     @RequestMapping(method= RequestMethod.POST, value="/createGame")
     public ResponseEntity<String> createGame(@RequestParam("hostName") String requestBody) {
-    //@PostMapping("/createGame")
-    //public ResponseEntity<String> createGame(@RequestBody HostNameRequest requestBody) {
+        //@PostMapping("/createGame")
+        //public ResponseEntity<String> createGame(@RequestBody HostNameRequest requestBody) {
         System.out.println(requestBody);
         String gameId = gameService.registerGame(requestBody);
         System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
@@ -36,6 +36,7 @@ public class GameController {
 
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
+
 
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {

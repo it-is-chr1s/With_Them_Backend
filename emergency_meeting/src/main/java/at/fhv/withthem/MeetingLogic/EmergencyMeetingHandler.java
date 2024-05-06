@@ -17,15 +17,15 @@ public class EmergencyMeetingHandler {
 
         System.out.println("NEW EMERGENCY MEETING CREATED: "+_emergencyMeetings.get(gameId));
     }
-    public void updateMeeting(String gameId, List<String>names){
+    public void updateLivePlayers(String gameId, List<String>names){
         _emergencyMeetings.get(gameId).setAlivePlayers(names);
     }
     public void startMeeting(String gameId) {
         if(meetingExists(gameId)){
-            if(_emergencyMeetings.get(gameId).isStartable()){
-                //TODO: logic for starting a meeting
+            //if(_emergencyMeetings.get(gameId).isStartable()){
                 _emergencyMeetings.get(gameId).setIsRunning(true);
-            }
+                //_emergencyMeetings.get(gameId).setStartable(false);
+            //}
         }
     }
     public void endMeeting(String gameId) {

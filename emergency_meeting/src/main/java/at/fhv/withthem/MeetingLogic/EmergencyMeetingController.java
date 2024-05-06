@@ -1,7 +1,6 @@
 package at.fhv.withthem.MeetingLogic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 @Controller
 @RestController
 public class EmergencyMeetingController {
@@ -34,31 +32,23 @@ public class EmergencyMeetingController {
         }
         else
         {
-            _emergencyMeetingHandler.updateMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+            _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
         }
     }
-    @MessageMapping("meeting/requestStartable")
-    public void stateOfTasks(@Payload String gameId) {
-        System.out.println("Startable for " + gameId);
-
-        HashMap<Integer, String> tasks = new HashMap<>();
-        for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(gameId)){
-            tasks.put(taskMessage.getId(), "available");
-        }
-        for (TaskMessage taskMessage : _tasksHandler.getActiveTasks(gameId)){
-            tasks.put(taskMessage.getId(), "active");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writeValueAsString(tasks));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", tasks);
+    @MessageMapping("meeting/startMeeting")
+    public void startMeeting(@Payload String gameId) {
+        //System.out.println("Startable for " + gameId);
+        //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
+        _emergencyMeetingHandler.startMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", true);
     }
-
+    @MessageMapping("meeting/endtMeeting")
+    public void endMeeting(@Payload String gameId) {
+        //System.out.println("Startable for " + gameId);
+        //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
+        _emergencyMeetingHandler.endMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", false);
+    }
   /*  @MessageMapping("meeting/requestStateOfPlayers")
     public void stateOfPlayers(@Payload String lobbyID) {
         System.out.println("requestStateOfTasks for " + lobbyID);
