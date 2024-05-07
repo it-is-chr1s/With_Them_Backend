@@ -1,6 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
 import at.fhv.withthem.GameLogic.Requests.ChangeColorRequest;
+import at.fhv.withthem.GameLogic.Requests.KillRequest;
 import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 public class GameController {
 
     private final GameService gameService;
@@ -85,20 +86,6 @@ public class GameController {
         gameService.updatePlayerDirection(gameId, playerName, direction);
     }
 
-    @MessageMapping("/kill")
-    public int killPlayer(String gameId, String payerId) {
-        if(!gameService.playerExists(gameId, payerId)) {
-            return -1;
-        }
-        if(!gameService.isAlive(gameId, payerId)) {
-            return -1;
-        }
-        if(!gameService.isCrewmate(gameId, payerId)) {
-            gameService.killPlayer(gameId, payerId);
-            return 1;
-        }
-        return -1;
-    }
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {
         String gameId=colorRequest.getGameId();
@@ -147,4 +134,18 @@ public class GameController {
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
 
+    @MessageMapping("/kill")
+    public void handleKill(KillRequest killRequest) {
+        String gameId = killRequest.getGameId();
+        String killerId = killRequest.getKillerId();
+
+        System.out.println("kill request. KillerID: " + killerId + "    game id: " + gameId);
+
+        boolean success = gameService.killPlayer(gameId, killerId);
+        if (success) {
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/kill", "Player " + killerId + " made a kill");
+        } /*else {
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/killFailed", "Kill failed for player " + killerId);
+        }*/
+    }
 }

@@ -12,11 +12,21 @@ public class Player {
 
     private boolean _isAlive = true;
     private boolean _hasMoved = false;
+
+    private long _lastKillTime = 0L;
     public Player(String id, Position position, Colors color) {
         this._id = id;
         this._position = position;
         this._direction = Direction.NONE;
         this._color=color;
+    }
+
+    public boolean canKillAgain() {
+        return System.currentTimeMillis() - _lastKillTime > 20_000;
+    }
+
+    public void recordKill() {
+        _lastKillTime = System.currentTimeMillis();
     }
 
     public int getRole() {return _role;}

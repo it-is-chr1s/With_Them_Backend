@@ -29,7 +29,7 @@ public class GameService {
         Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue(), player.isAlive()));
         }
     }
 
@@ -47,7 +47,7 @@ public class GameService {
 
                     if (canMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                     }
                 }
@@ -100,8 +100,7 @@ public class GameService {
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         // TODO: loop through all players here to draw them all
-        messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
-
+        messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(playerId, startPosition, color.getHexValue(), true));
     }
 
     public String registerGame(String hostName) {
@@ -150,10 +149,32 @@ public class GameService {
         return getGame(gameId).getMap();
     }
 
-    public boolean killPlayer(String gameId, String playerId) {;
+    public boolean killPlayer(String gameId, String killerId) {
+        Game session = getGame(gameId);
+        if (session == null) return false;
 
-        return true;
+        Player killer = session.getPlayers().get(killerId);
+        if (killer == null || !killer.canKillAgain() || killer.getRole() != 1) return false;
+
+        for (Player target : session.getPlayers().values()) {
+            if (!target.getId().equals(killerId) && target.isAlive() && target.getRole() != 1) {
+                if (isInKillRange(killer.getPosition(), target.getPosition())) {
+                    target.kill();
+                    killer.recordKill();
+                    System.out.println("kill succesful");
+                    messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(target.getId(), target.getPosition(), target.getColor().toString(), target.isAlive()));
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
+    private boolean isInKillRange(Position killer, Position target) {
+        int distance = (int)(Math.abs(killer.getX() - target.getX()) + Math.abs(killer.getY() - target.getY()));
+        return distance <= 1;
+    }
+
 
     public boolean isAlive(String gameId, String payerId) {
         return games.get(gameId).getPlayers().get(payerId).isAlive();
