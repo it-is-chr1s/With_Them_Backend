@@ -16,6 +16,7 @@ public class Player {
     private long _lastKillTime = 0L;
     public Player(String id, Position position, Colors color) {
         this._id = id;
+        this._name=id;
         this._position = position;
         this._direction = Direction.NONE;
         this._color=color;
@@ -69,5 +70,9 @@ public class Player {
 
     public void setHasMoved(boolean hasMoved) {
         this._hasMoved = hasMoved;
+    }
+
+    public void setAlive(boolean alive) {
+        _isAlive = alive;
     }
 }

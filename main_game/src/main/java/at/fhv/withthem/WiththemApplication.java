@@ -1,10 +1,9 @@
 package at.fhv.withthem;
 
 import at.fhv.withthem.GameLogic.GameController;
-import at.fhv.withthem.GameLogic.GameMap;
+import at.fhv.withthem.GameLogic.Maps.GameMap;
 import at.fhv.withthem.GameLogic.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
