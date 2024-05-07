@@ -1,46 +1,22 @@
-package at.fhv.withthem.GameLogic;
+package at.fhv.withthem.GameLogic.Maps;
 
 import org.springframework.stereotype.Component;
 
-@Component
-public class GameMap {
-    private final String[][] _grid;
-    private final int _height = 20;
-    private final int _width = 40;
+
+public abstract class GameMap {
+    protected final String[][] _grid;
+
+    private int _height;
+    private int _width;
     //TODO: Constructor for lobby
-    public GameMap() {
-        this._grid = new String[_height][_width];
 
-        initializeMapLayout();
+    public GameMap(int height, int width) {
+        _grid = new String[height][width];
+        _height = height;
+        _width = width;
     }
 
-    public void initializeMapLayout() {
-        setWall(5, 6);
-        setWall(5, 5);
-        setWall(6, 5);
-        setWall(7, 5);
-        setWall(8, 5);
-        setWall(9, 5);
-        setWall(9, 6);
-        setWall(9, 7);
-        setWall(9, 8);
-        setWall(9, 9);
-        setWall(8, 9);
-        setWall(7, 9);
-        setWall(6, 9);
-        setWall(5, 9);
-        setWall(5, 8);
 
-        setMeetingPoint(15, 3);
-        //type should not include String %id
-        setTask(7, 7, "Connecting Wires", 1);
-        setTask(11, 5, "File Download", 2);
-        setTask(11, 9, "File Upload", 2);
-
-        setTask(15, 7, "Connecting Wires", 3);
-        setTask(19, 5, "File Download", 4);
-        setTask(19, 9, "File Upload", 4);
-    }
 
     public void setTask(int x, int y, String type, int id){
         _grid[y][x] = type + "%id" + id;

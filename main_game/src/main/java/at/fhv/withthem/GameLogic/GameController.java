@@ -30,8 +30,7 @@ public class GameController {
         String gameId = gameService.registerGame(requestBody);
         System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
 
-        loadTasks(gameId, gameService.getTaskPositions(gameId));
-        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+
 
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
@@ -40,6 +39,9 @@ public class GameController {
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
+        loadTasks(gameId, gameService.getTaskPositions(gameId));
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+        sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 

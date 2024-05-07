@@ -1,5 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
+import at.fhv.withthem.GameLogic.Maps.GameMap;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Game {
@@ -46,6 +48,10 @@ public class Game {
     }
     public GameMap getMap() {
         return _map;
+    }
+
+    public void setGameMap(GameMap map){
+        _map=map;
     }
 
     public String getHost() {

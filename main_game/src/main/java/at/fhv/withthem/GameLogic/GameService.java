@@ -1,15 +1,15 @@
 package at.fhv.withthem.GameLogic;
 
+import at.fhv.withthem.GameLogic.Maps.GameMap;
+import at.fhv.withthem.GameLogic.Maps.LobbyMap;
+import at.fhv.withthem.GameLogic.Maps.PolusMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.Console;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 public class GameService {
@@ -111,7 +111,7 @@ public class GameService {
 
     public String registerGame(String hostName) {
         String gameId=generateGameId();
-        GameMap map=new GameMap(); //TODO:how to create/find/get map???
+        GameMap map=new LobbyMap(); //TODO:how to create/find/get map???
         games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
@@ -184,8 +184,9 @@ public class GameService {
     }
 
     public void startGame(String gameId) {
-        System.out.println(gameId);
-        System.out.println(getGame(gameId));
+        if(getGame(gameId).isRunning()) {
+            return;
+        }
         Settings gameSettings = getGame(gameId).getSettings();
         Set<String> playerKeys = getGame(gameId).getPlayers().keySet();
         HashMap<Integer, Integer> roles = gameSettings .getRoles();
@@ -196,12 +197,15 @@ public class GameService {
                 String randomKey = playerKeys.toArray()[randomId].toString();
                 if(getGame(gameId).getPlayers().get(randomKey).getRole() == 0) {
                     getGame(gameId).getPlayers().get(randomKey).setRole(key);
-                    playerKeys.remove(randomKey);
                     i++;
-                    messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + randomKey, key);
                 }
             }
         }
+        for(Player player : getGame(gameId).getPlayers().values()) {
+            messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
+            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue()));
+        }
+        getGame(gameId).setGameMap(new PolusMap());
         getGame(gameId).setRunning(true);
     }
 }

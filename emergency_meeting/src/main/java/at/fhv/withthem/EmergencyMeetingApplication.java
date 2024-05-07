@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @SpringBootApplication
 @Configuration
 @ComponentScan({"at.fhv.withthem.MeetingLogic", "at.fhv.withthem.WebSocket"})
-public class EmergencyMeetingApplication {
+public class sddwadsddasassdsaEmergencyMeetingApplication {
     public static void main(String[] args) {
         SpringApplication.run(EmergencyMeetingApplication.class, args);
     }
