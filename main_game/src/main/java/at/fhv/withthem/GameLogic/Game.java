@@ -14,6 +14,8 @@ public class Game {
 
     private boolean _isRunning;
 
+    private boolean _isWon;
+
     public Game(String gameId, GameMap map, String host){
         _gameId=gameId;
         this._map =map;
@@ -21,6 +23,14 @@ public class Game {
         _players.put(host, _host);
         _settings=new Settings();
         _isRunning=false;
+    }
+
+    public boolean isWon() {
+        return _isWon;
+    }
+
+    public void setWon(boolean won) {
+        _isWon = won;
     }
 
     public boolean isRunning() {

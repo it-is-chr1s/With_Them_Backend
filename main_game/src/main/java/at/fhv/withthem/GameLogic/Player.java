@@ -61,4 +61,8 @@ public class Player {
     public void setHasMoved(boolean hasMoved) {
         this._hasMoved = hasMoved;
     }
+
+    public void setAlive(boolean alive) {
+        _isAlive = alive;
+    }
 }

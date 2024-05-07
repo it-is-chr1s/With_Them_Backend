@@ -36,7 +36,11 @@ public class GameService {
 
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
+
         games.forEach((gameId, game) -> {
+
+
+
             ConcurrentHashMap<String, Player> players = game.getPlayers();
             players.forEach((playerId, player) -> {
                 if (player.hasMoved()) {
@@ -54,7 +58,57 @@ public class GameService {
                     }
                 }
             });
+            if(game.isRunning()) {
+                System.out.println("Check if game is won ");
+                GameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
+
+            }
         });
+    }
+
+    public void gameWon(String gameId){
+        games.get(gameId).setWon(true);
+    }
+
+    private int GameWonByPlayersAlive(String gameId) {
+        Game game = getGame(gameId);
+        int imposterAlive = 0;
+        int crewAlive = 0;
+        for(Player player : game.getPlayers().values()){
+            if(player.isAlive()){
+                if(player.getRole() == 0){
+                    crewAlive++;
+                }else{
+                    imposterAlive++;
+                }
+            }
+        }
+
+        if(imposterAlive == 0){
+            return 0;
+        }else if(crewAlive == imposterAlive){
+            return 1;
+        } else if (imposterAlive > crewAlive) {
+            return 1;
+        }
+        return -1;
+    }
+
+    private void GameOver(String gameId){
+        int won = GameWonByPlayersAlive(gameId);
+        if(won == -1){
+            return;
+        }
+        if(won == 0){
+            gameWon(gameId);
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/gameOver", "Crewmate");
+        }else if(won == 1){
+            gameWon(gameId);
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/gameOver", "Imposter");
+        }
+        getGame(gameId).setRunning(false);
+        getGame(gameId).getPlayers().values().forEach(player -> {player.setRole(0);  player.setAlive(true);});
+        getGame(gameId).setGameMap(new LobbyMap());
     }
 
     public synchronized boolean movePlayer(String gameId, String playerId, Direction direction, float speed) {
@@ -184,6 +238,7 @@ public class GameService {
     }
 
     public void startGame(String gameId) {
+
         if(getGame(gameId).isRunning()) {
             return;
         }
@@ -205,6 +260,7 @@ public class GameService {
             messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
             messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue()));
         }
+        System.out.println("Game started!");
         getGame(gameId).setGameMap(new PolusMap());
         getGame(gameId).setRunning(true);
     }
