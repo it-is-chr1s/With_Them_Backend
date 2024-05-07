@@ -5,7 +5,6 @@ import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.catalina.Host;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;

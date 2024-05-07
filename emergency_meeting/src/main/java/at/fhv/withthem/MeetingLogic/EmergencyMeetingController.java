@@ -37,87 +37,17 @@ public class EmergencyMeetingController {
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
-        //System.out.println("Startable for " + gameId);
+        System.out.println("Started for " + gameId);
+
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
         _emergencyMeetingHandler.startMeeting(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", true);
     }
-    @MessageMapping("meeting/endtMeeting")
+    @MessageMapping("meeting/endMeeting")
     public void endMeeting(@Payload String gameId) {
-        //System.out.println("Startable for " + gameId);
+        System.out.println("Ended for " + gameId);
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
         _emergencyMeetingHandler.endMeeting(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", false);
     }
-  /*  @MessageMapping("meeting/requestStateOfPlayers")
-    public void stateOfPlayers(@Payload String lobbyID) {
-        System.out.println("requestStateOfTasks for " + lobbyID);
-
-        HashMap<Integer, String> tasks = new HashMap<>();
-        for (EmergencyMeetingMessage emergencyMeetingMessage : _emergencyMeetingHandler.getAvailableTasks(lobbyID)) {
-            tasks.put(emergencyMeetingMessage.getId(), "available");
-        }
-        for (EmergencyMeetingMessage emergencyMeetingMessage : _emergencyMeetingHandler.getActiveTasks(lobbyID)) {
-            tasks.put(emergencyMeetingMessage.getId(), "active");
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writeValueAsString(tasks));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        _messagingTemplate.convertAndSend("/topic/meeting/" + lobbyID + "/stateOfTasks", tasks);
-    }
-
-    @MessageMapping("meeting/start")
-    public void startTask(EmergencyMeetingMessage emergencyMeetingMessage) {
-
-       ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println("Task started: " + mapper.writeValueAsString(emergencyMeetingMessage));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        _emergencyMeetingHandler.startTask(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getId(), emergencyMeetingMessage.getPlayer());
-        stateOfPlayers(emergencyMeetingMessage.getLobby());
-        _messagingTemplate.convertAndSend("/topic/meeting/" + emergencyMeetingMessage.getLobby() + "/currentTask/" + emergencyMeetingMessage.getPlayer(), _emergencyMeetingHandler.getCurrentState(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getPlayer()));
-    }
-
-    @MessageMapping("/meeting/playerAction")
-    public void playerAction(EmergencyMeetingMessage emergencyMeetingMessage) {
-        _emergencyMeetingHandler.playerAction(emergencyMeetingMessage, new Reaction() {
-            @Override
-            public void react() {
-                ObjectMapper mapper = new ObjectMapper();
-                try {
-                    System.out.println(mapper.writeValueAsString(_emergencyMeetingHandler.getCurrentState(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getPlayer())));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-                _messagingTemplate.convertAndSend("/topic/meeting/" + emergencyMeetingMessage.getLobby() + "/currentTask/" + emergencyMeetingMessage.getPlayer(), _emergencyMeetingHandler.getCurrentState(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getPlayer()));
-            }
-        });
-    }
-
-    @MessageMapping("meeting/end")
-    public void cancelTask(EmergencyMeetingMessage emergencyMeetingMessage) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writeValueAsString(emergencyMeetingMessage));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        if (_emergencyMeetingHandler.taskCompleted(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getId())) {
-            _emergencyMeetingHandler.finishTask(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getId());
-        } else {
-            _emergencyMeetingHandler.cancelTask(emergencyMeetingMessage.getLobby(), emergencyMeetingMessage.getId());
-        }
-
-        stateOfPlayers(emergencyMeetingMessage.getLobby());
-        _messagingTemplate.convertAndSend("/topic/meeting/" + emergencyMeetingMessage.getLobby() + "/currentTask/" + emergencyMeetingMessage.getPlayer(), "");
-    }
-*/
-
 }

@@ -14,13 +14,14 @@ public class EmergencyMeetingHandler {
     }
     public void createMeeting(String gameId, List<String>names){
         _emergencyMeetings.put(gameId, new EmergencyMeeting(gameId,names));
-
-        System.out.println("NEW EMERGENCY MEETING CREATED: "+_emergencyMeetings.get(gameId));
     }
     public void updateLivePlayers(String gameId, List<String>names){
         _emergencyMeetings.get(gameId).setAlivePlayers(names);
     }
     public void startMeeting(String gameId) {
+        _emergencyMeetings.forEach((id, game) -> {
+           System.out.println("GAME ID: "+id);
+        });
         if(meetingExists(gameId)){
             //if(_emergencyMeetings.get(gameId).isStartable()){
                 _emergencyMeetings.get(gameId).setIsRunning(true);
@@ -29,8 +30,11 @@ public class EmergencyMeetingHandler {
         }
     }
     public void endMeeting(String gameId) {
-        _emergencyMeetings.get(gameId).setIsRunning(false);
-        _emergencyMeetings.get(gameId).setStartable(false);
+        if(meetingExists(gameId)) {
+
+            _emergencyMeetings.get(gameId).setIsRunning(false);
+            //_emergencyMeetings.get(gameId).setStartable(false);
+        }
         //TODO: count down timer
     }
     public void removeMeeting(String gameId){
