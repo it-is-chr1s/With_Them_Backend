@@ -87,12 +87,14 @@ public class GameController {
     public void sendMapLayout(MapRequest mapRequest) {
         String gameId = mapRequest.getGameId();
         List<Position> wallPositions = gameService.getWallPositions(gameId);
-        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);//TODO:provide gameId
+        List<TaskPosition> taskPositions = gameService.getTaskPositions(gameId);
+        Position meetingPosition = gameService.getMeetingPositions(gameId);
         Map<String, Object> mapLayout = new HashMap<>();
         mapLayout.put("wallPositions", wallPositions);
         mapLayout.put("taskPositions", taskPositions);
         mapLayout.put("width", gameService.getMap(gameId).getWidth());
         mapLayout.put("height", gameService.getMap(gameId).getHeight());
+        mapLayout.put("meetingPosition", meetingPosition);
 
         messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }

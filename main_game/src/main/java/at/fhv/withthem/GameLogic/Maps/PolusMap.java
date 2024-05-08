@@ -10,6 +10,7 @@ public class PolusMap extends GameMap{
                 initializeMapLayout();
         }
         public void initializeMapLayout() {
+                /*
                 for (int i = 0; i < 50; i++) {
                         setWall(0,i);
                         setWall(100-1,i);
@@ -37,7 +38,7 @@ public class PolusMap extends GameMap{
                 for (int i = 50; i < 100; i++) {
                         setWall(i,20);
 
-                }
+                } */
 
                 setWall(5, 6);
                 setWall(5, 5);
