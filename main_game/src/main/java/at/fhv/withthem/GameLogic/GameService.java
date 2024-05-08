@@ -1,5 +1,9 @@
 package at.fhv.withthem.GameLogic;
 
+import at.fhv.withthem.GameLogic.Maps.GameMap;
+import at.fhv.withthem.GameLogic.Maps.LobbyMap;
+import at.fhv.withthem.GameLogic.Maps.PolusMap;
+import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -7,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 public class GameService {
@@ -29,12 +31,13 @@ public class GameService {
         Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue(), player.isAlive()));
         }
     }
 
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
+
         games.forEach((gameId, game) -> {
             ConcurrentHashMap<String, Player> players = game.getPlayers();
             players.forEach((playerId, player) -> {
@@ -47,12 +50,72 @@ public class GameService {
 
                     if (canMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
                     }
                 }
             });
+            if(game.isRunning()) {
+                GameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
+            }
         });
+    }
+
+    public void gameWon(String gameId){
+        games.get(gameId).setWon(true);
+    }
+
+    private int GameWonByPlayersAlive(String gameId) {
+        Game game = getGame(gameId);
+        int imposterAlive = 0;
+        int crewAlive = 0;
+        for(Player player : game.getPlayers().values()){
+            if(player.isAlive()){
+                if(player.getRole() == 0){
+                    crewAlive++;
+                }else{
+                    imposterAlive++;
+                }
+            }
+        }
+
+        if(imposterAlive == 0){
+            return 0;
+        }else if(crewAlive == imposterAlive){
+            return 1;
+        } else if (imposterAlive > crewAlive) {
+            return 1;
+        }
+        return -1;
+    }
+
+    private void GameOver(String gameId){
+        int won = GameWonByPlayersAlive(gameId);
+        if(won == -1){
+            return;
+        }
+        if(won == 0){
+            gameWon(gameId);
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/gameOver", "Crewmate");
+        }else if(won == 1){
+            gameWon(gameId);
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/gameOver", "Imposter");
+        }
+        getGame(gameId).setRunning(false);
+        getGame(gameId).getPlayers().values().forEach(player -> {player.setRole(0);  player.setAlive(true); player.setPosition(new Position(0,0));});
+        getGame(gameId).setGameMap(new LobbyMap());
+
+
+        List<Position> wallPositions = getWallPositions(gameId);
+        List<TaskPosition> taskPositions = getTaskPositions(gameId);
+        Map<String, Object> mapLayout = new HashMap<>();
+        mapLayout.put("wallPositions", wallPositions);
+        mapLayout.put("taskPositions", taskPositions);
+        mapLayout.put("width", getMap(gameId).getWidth());
+        mapLayout.put("height", getMap(gameId).getHeight());
+
+        messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
 
     public synchronized boolean movePlayer(String gameId, String playerId, Direction direction, float speed) {
@@ -78,6 +141,9 @@ public class GameService {
         return getMap(gameId).isTask((int)position.getX(), (int)position.getY());
     }
 
+    private boolean canCallEmergencyMeeting(String gameId, Position position){
+        return getMap(gameId).isMeetingPoint((int)position.getX(),(int)position.getY());
+    }
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
         float newX = currentPosition.getX() + direction.getDx() * speed;
         float newY = currentPosition.getY() + direction.getDy() * speed;
@@ -99,22 +165,27 @@ public class GameService {
     public void registerPlayer(String gameID, String playerId, Position startPosition, Colors color) {
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
-        // TODO: loop through all players here to draw them all
-        messagingTemplate.convertAndSend("/topic/" +gameID+"/position", new PlayerPosition(playerId, startPosition, color.getHexValue()));
-
+        getPlayers(gameID).forEach((id, player) -> {
+            messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
+        });
     }
 
     public String registerGame(String hostName) {
         String gameId=generateGameId();
-        GameMap map=new GameMap(); //TODO:how to create/find/get map???
+        GameMap map=new LobbyMap(); //TODO:how to create/find/get map???
         games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
 
     private String generateGameId() {
-        // unique game ID
-        //TODO:find better method
-        return UUID.randomUUID().toString();
+        int codeLength = 5;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder(codeLength);
+        for (int i = 0; i < codeLength; i++) {
+            int randomIndex = new Random().nextInt(characters.length());
+            code.append(characters.charAt(randomIndex));
+        }
+        return code.toString();
     }
 
     public List<Position> getWallPositions(String gameId) {
@@ -128,6 +199,20 @@ public class GameService {
             }
         }
         return wallPositions;
+    }
+    public Position getMeetingPositions(String gameId) {
+        GameMap map =getMap(gameId);
+        Position meetingPosition=new Position(-1,-1);
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (map.isMeetingPoint(x, y)) {
+                    meetingPosition=new Position(x,y);
+                }
+            }
+        }
+        if(meetingPosition.getX()==-1)
+            System.out.println("IS MEETING POINT IN MAP DOES NOT WORK");
+        return meetingPosition;
     }
 
     public List<TaskPosition> getTaskPositions(String gameId){
@@ -150,10 +235,32 @@ public class GameService {
         return getGame(gameId).getMap();
     }
 
-    public boolean killPlayer(String gameId, String playerId) {;
+    public boolean killPlayer(String gameId, String killerId) {
+        Game session = getGame(gameId);
+        if (session == null) return false;
 
-        return true;
+        Player killer = session.getPlayers().get(killerId);
+        if (killer == null || !killer.canKillAgain() || killer.getRole() != 1) return false;
+
+        for (Player target : session.getPlayers().values()) {
+            if (!target.getId().equals(killerId) && target.isAlive() && target.getRole() != 1) {
+                if (isInKillRange(killer.getPosition(), target.getPosition())) {
+                    target.kill();
+                    killer.recordKill();
+                    System.out.println("kill succesful");
+                    messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(target.getId(), target.getPosition(), target.getColor().toString(), target.isAlive()));
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
+    private boolean isInKillRange(Position killer, Position target) {
+        int distance = (int)(Math.abs(killer.getX() - target.getX()) + Math.abs(killer.getY() - target.getY()));
+        return distance <= 1;
+    }
+
 
     public boolean isAlive(String gameId, String payerId) {
         return games.get(gameId).getPlayers().get(payerId).isAlive();
@@ -165,8 +272,10 @@ public class GameService {
     }
 
     public void startGame(String gameId) {
-        System.out.println(gameId);
-        System.out.println(getGame(gameId));
+
+        if(getGame(gameId).isRunning()) {
+            return;
+        }
         Settings gameSettings = getGame(gameId).getSettings();
         Set<String> playerKeys = getGame(gameId).getPlayers().keySet();
         HashMap<Integer, Integer> roles = gameSettings .getRoles();
@@ -177,12 +286,17 @@ public class GameService {
                 String randomKey = playerKeys.toArray()[randomId].toString();
                 if(getGame(gameId).getPlayers().get(randomKey).getRole() == 0) {
                     getGame(gameId).getPlayers().get(randomKey).setRole(key);
-                    playerKeys.remove(randomKey);
                     i++;
-                    messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + randomKey, key);
                 }
             }
         }
+        for(Player player : getGame(gameId).getPlayers().values()) {
+            player.setPosition(new Position(3,3));
+            messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
+            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
+        }
+        System.out.println("Game started!");
+        getGame(gameId).setGameMap(new PolusMap());
         getGame(gameId).setRunning(true);
     }
 }

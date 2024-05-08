@@ -1,6 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
 import at.fhv.withthem.GameLogic.Requests.ChangeColorRequest;
+import at.fhv.withthem.GameLogic.Requests.KillRequest;
 import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import at.fhv.withthem.GameLogic.Requests.MoveRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,34 +11,43 @@ import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:5173")
 public class GameController {
-
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
-    @PostMapping("/createGame")
-    public ResponseEntity<String> createGame(@RequestBody Map<String, String> requestBody) {
-        // Call the method to register a new game
-        String gameId = gameService.registerGame(requestBody.get("hostName"));
-        System.out.println(gameId);
-        loadTasks(gameId, gameService.getTaskPositions(gameId));
+
+    @RequestMapping(method= RequestMethod.POST, value="/createGame")
+    public ResponseEntity<String> createGame(@RequestParam("hostName") String requestBody) {
+        //@PostMapping("/createGame")
+        //public ResponseEntity<String> createGame(@RequestBody HostNameRequest requestBody) {
+        System.out.println(requestBody);
+        String gameId = gameService.registerGame(requestBody);
+        System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
+
+
+
+        return new ResponseEntity<>(gameId, HttpStatus.OK);
+    }
+
+    @PostMapping("/TasksFinished")
+    public ResponseEntity<String> tasksFinished(@RequestBody String gameId) {
+        gameService.gameWon(gameId);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
+        loadTasks(gameId, gameService.getTaskPositions(gameId));
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+        sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -47,31 +57,6 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    /*
-
-    @MessageMapping("/move")
-    public void handleMove(MoveRequest moveRequest) {
-
-        String playerName = moveRequest.getName();
-        Direction direction = moveRequest.getDirection();
-
-        System.out.println("moving player");
-        System.out.println(playerName);
-        System.out.println(direction);
-
-        if (!gameService.playerExists(playerName)) {
-            gameService.registerPlayer(playerName, new Position(0, 0));
-        }
-
-        boolean success = gameService.movePlayer(playerName, direction, 0.01f);
-        if (success) {
-            Player player = gameService.getPlayer(playerName);
-            messagingTemplate.convertAndSend("/topic/position", new PlayerPosition(playerName, player.getPosition()));
-        }
-    }
-
-
-    */
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
         String gameId=moveRequest.getGameId();
@@ -79,26 +64,13 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);
+            loadEmergencyMeeting("In MOVE"+gameId,gameService.getPlayers(gameId));
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
     }
 
-    @MessageMapping("/kill")
-    public int killPlayer(String gameId, String payerId) {
-        if(!gameService.playerExists(gameId, payerId)) {
-            return -1;
-        }
-        if(!gameService.isAlive(gameId, payerId)) {
-            return -1;
-        }
-        if(!gameService.isCrewmate(gameId, payerId)) {
-            gameService.killPlayer(gameId, payerId);
-            return 1;
-        }
-        return -1;
-    }
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {
         String gameId=colorRequest.getGameId();
@@ -147,4 +119,41 @@ public class GameController {
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
 
+    @MessageMapping("/kill")
+    public void handleKill(KillRequest killRequest) {
+        String gameId = killRequest.getGameId();
+        String killerId = killRequest.getKillerId();
+
+        System.out.println("kill request. KillerID: " + killerId + "    game id: " + gameId);
+
+        boolean success = gameService.killPlayer(gameId, killerId);
+       /* if (success) {
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/kill", "Player " + killerId + " made a kill");
+        } else {
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/killFailed", "Kill failed for player " + killerId);
+        }*/
+    }
+    public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
+        List<String>alivePlayers=new LinkedList<>();
+        players.forEach((playerId, player) -> {
+            System.out.println("Players:"+ player.getName());
+            if(player.isAlive()){
+                alivePlayers.add(player.getName());
+            }
+        });
+        LoadEmergencyMeetingMessage loadEmergencyMeetingMessages=new LoadEmergencyMeetingMessage(gameId,alivePlayers);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("Message to EmergencyMeeting:"+mapper.writeValueAsString(loadEmergencyMeetingMessages));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        String url = "http://localhost:4002/loadEmergencyMeeting";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<LoadEmergencyMeetingMessage> requestEntity = new HttpEntity<>(loadEmergencyMeetingMessages, headers);
+        restTemplate.postForEntity(url, requestEntity, String.class);
+    }
 }

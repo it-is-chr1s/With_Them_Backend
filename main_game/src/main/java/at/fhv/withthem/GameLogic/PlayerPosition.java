@@ -4,11 +4,21 @@ public class PlayerPosition {
     private String _playerId;
     private Position _position;
     private String _color;
+    private boolean _isAlive;
 
-    public PlayerPosition(String playerId, Position position, String color) {
+    public PlayerPosition(String playerId, Position position, String color, boolean isAlive) {
         _playerId = playerId;
         _position = position;
         _color=color;
+        _isAlive=isAlive;
+    }
+
+    public boolean isAlive() {
+        return _isAlive;
+    }
+
+    public void setAlive(boolean alive) {
+        _isAlive = alive;
     }
 
     public String getPlayerId() {
