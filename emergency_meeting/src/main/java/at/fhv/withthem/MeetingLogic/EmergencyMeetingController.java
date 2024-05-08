@@ -41,14 +41,14 @@ public class EmergencyMeetingController {
         System.out.println("Started for " + gameId);
 
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
-        _emergencyMeetingHandler.startMeeting(gameId);
-        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", true);
+        boolean running=_emergencyMeetingHandler.startMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
     }
     @MessageMapping("meeting/endMeeting")
     public void endMeeting(@Payload String gameId) {
         System.out.println("Ended for " + gameId);
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
-        _emergencyMeetingHandler.endMeeting(gameId);
-        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", false);
+        boolean running=_emergencyMeetingHandler.endMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
     }
 }
