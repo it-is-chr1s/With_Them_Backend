@@ -47,6 +47,9 @@ public class EmergencyMeetingHandler {
         }
         return _emergencyMeetings.get(gameId).getIsRunning();
     }
+    public boolean getStartable(String gameId){
+        return _emergencyMeetings.get(gameId).isStartable();
+    }
     public void removeMeeting(String gameId){
         _emergencyMeetings.remove(gameId);
     }
