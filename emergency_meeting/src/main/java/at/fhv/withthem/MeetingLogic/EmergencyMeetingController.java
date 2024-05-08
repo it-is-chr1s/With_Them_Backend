@@ -34,6 +34,7 @@ public class EmergencyMeetingController {
         {
             _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
         }
+        _messagingTemplate.convertAndSend("/topic/meeting/" + loadEmergencyMeetingMessage.get_gameId() + "/running", false);
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {

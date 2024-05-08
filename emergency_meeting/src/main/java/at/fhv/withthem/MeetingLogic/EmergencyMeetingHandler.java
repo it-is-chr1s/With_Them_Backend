@@ -19,17 +19,17 @@ public class EmergencyMeetingHandler {
         _emergencyMeetings.get(gameId).setAlivePlayers(names);
     }
     public void startMeeting(String gameId) {
-        _emergencyMeetings.forEach((id, game) -> {
-           System.out.println("GAME ID: "+id);
-        });
+        System.out.println("exist:"+meetingExists(gameId));
         if(meetingExists(gameId)){
             //if(_emergencyMeetings.get(gameId).isStartable()){
                 _emergencyMeetings.get(gameId).setIsRunning(true);
+                System.out.println("is runnin:"+ _emergencyMeetings.get(gameId).getIsRunning());
                 //_emergencyMeetings.get(gameId).setStartable(false);
             //}
         }
     }
     public void endMeeting(String gameId) {
+        System.out.println("exist:"+meetingExists(gameId));
         if(meetingExists(gameId)) {
 
             _emergencyMeetings.get(gameId).setIsRunning(false);
