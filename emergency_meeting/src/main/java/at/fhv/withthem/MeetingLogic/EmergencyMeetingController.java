@@ -6,12 +6,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class EmergencyMeetingController {
 
     private final SimpMessagingTemplate _messagingTemplate;
@@ -34,20 +33,28 @@ public class EmergencyMeetingController {
         {
             _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
         }
+        _messagingTemplate.convertAndSend("/topic/meeting/" + loadEmergencyMeetingMessage.get_gameId() + "/running", false);
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
         System.out.println("Started for " + gameId);
 
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
-        _emergencyMeetingHandler.startMeeting(gameId);
-        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", true);
+        boolean running=_emergencyMeetingHandler.startMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
     }
     @MessageMapping("meeting/endMeeting")
     public void endMeeting(@Payload String gameId) {
         System.out.println("Ended for " + gameId);
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
-        _emergencyMeetingHandler.endMeeting(gameId);
-        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", false);
+        boolean running=_emergencyMeetingHandler.endMeeting(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
+    }
+
+    @GetMapping("/meeting/{gameId}/startable")
+    @ResponseBody
+    public boolean getStartable(@PathVariable String gameId) {
+        System.out.println("IS STARTABLE:"+_emergencyMeetingHandler.getStartable(gameId));
+        return _emergencyMeetingHandler.getStartable(gameId);
     }
 }
