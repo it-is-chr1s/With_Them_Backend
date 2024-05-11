@@ -1,5 +1,6 @@
 package at.fhv.withthem.MeetingLogic;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class EmergencyMeeting {
@@ -9,15 +10,20 @@ public class EmergencyMeeting {
     private boolean _isRunning;
     private int _coolDownTime;
     private List<String> _alivePlayers;
-    private int _Votes;
 
+    private HashMap<String,String> _votes;
     public EmergencyMeeting(String gameId, List<String>playerNames){
         _startable=true;
         _isRunning=false;
         _gameId=gameId;
         _alivePlayers =playerNames;
+        _votes =new HashMap<>();
     }
 
+    public void addVote(String voter, String nominated){
+        if(_votes.get(voter)!=null && _alivePlayers.contains(voter))
+            _votes.put(voter,nominated);
+    }
     public String getGameId() {
         return _gameId;
     }
