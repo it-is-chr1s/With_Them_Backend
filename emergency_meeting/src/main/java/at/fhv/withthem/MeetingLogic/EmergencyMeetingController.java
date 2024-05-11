@@ -28,12 +28,14 @@ public class EmergencyMeetingController {
 
         if(!_emergencyMeetingHandler.meetingExists(loadEmergencyMeetingMessage.get_gameId())){
             _emergencyMeetingHandler.createMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+            System.out.println("Created:"+loadEmergencyMeetingMessage.get_gameId());
         }
         else
         {
             _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+            System.out.println("Updated:"+loadEmergencyMeetingMessage.get_gameId());
         }
-        _messagingTemplate.convertAndSend("/topic/meeting/" + loadEmergencyMeetingMessage.get_gameId() + "/running", false);
+        System.out.println(loadEmergencyMeetingMessage.get_names().get(0));
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
@@ -54,7 +56,6 @@ public class EmergencyMeetingController {
     @GetMapping("/meeting/{gameId}/startable")
     @ResponseBody
     public boolean getStartable(@PathVariable String gameId) {
-        System.out.println("IS STARTABLE:"+_emergencyMeetingHandler.getStartable(gameId));
         return _emergencyMeetingHandler.getStartable(gameId);
     }
 }

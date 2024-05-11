@@ -1,4 +1,4 @@
-package at.fhv.withthem.MeetingLogic.task;
+package at.fhv.withthem.MeetingLogic;
 
 import java.util.List;
 

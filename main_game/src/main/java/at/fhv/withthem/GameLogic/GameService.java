@@ -172,7 +172,7 @@ public class GameService {
 
     public String registerGame(String hostName) {
         String gameId=generateGameId();
-        GameMap map=new LobbyMap(); //TODO:how to create/find/get map???
+        GameMap map=new LobbyMap();
         games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }

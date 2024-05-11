@@ -65,7 +65,6 @@ public class GameController {
 
         if (!gameService.playerExists(gameId, playerName)) {
             gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);
-            loadEmergencyMeeting("In MOVE"+gameId,gameService.getPlayers(gameId));
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
@@ -129,6 +128,9 @@ public class GameController {
         System.out.println("kill request. KillerID: " + killerId + "    game id: " + gameId);
 
         boolean success = gameService.killPlayer(gameId, killerId);
+        if(success)
+            loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+
        /* if (success) {
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kill", "Player " + killerId + " made a kill");
         } else {

@@ -1,6 +1,5 @@
 package at.fhv.withthem.MeetingLogic;
 
-import at.fhv.withthem.MeetingLogic.task.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
