@@ -13,12 +13,12 @@ import java.util.List;
 )
 public class EmergencyMeetingMessage {
     private String _gameId;
-    private List<String>_names;
+    private List<String> _name;
 
     @JsonCreator
     public EmergencyMeetingMessage(String lobby, List<String>names) {
         _gameId = lobby;
-        _names = names;
+        _name = names;
     }
 
     public String get_gameId() {
@@ -29,11 +29,11 @@ public class EmergencyMeetingMessage {
         this._gameId = _gameId;
     }
 
-    public List<String> get_names() {
-        return _names;
+    public List<String> get_name() {
+        return _name;
     }
 
-    public void set_names(List<String> _names) {
-        this._names = _names;
+    public void set_name(List<String> _name) {
+        this._name = _name;
     }
 }

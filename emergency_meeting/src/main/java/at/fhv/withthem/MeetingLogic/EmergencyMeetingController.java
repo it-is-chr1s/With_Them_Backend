@@ -27,15 +27,15 @@ public class EmergencyMeetingController {
     public void loadLobby(@RequestBody LoadEmergencyMeetingMessage loadEmergencyMeetingMessage) throws JsonProcessingException {
 
         if(!_emergencyMeetingHandler.meetingExists(loadEmergencyMeetingMessage.get_gameId())){
-            _emergencyMeetingHandler.createMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+            _emergencyMeetingHandler.createMeeting(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_name());
             System.out.println("Created:"+loadEmergencyMeetingMessage.get_gameId());
         }
         else
         {
-            _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_names());
+            _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_name());
             System.out.println("Updated:"+loadEmergencyMeetingMessage.get_gameId());
         }
-        System.out.println(loadEmergencyMeetingMessage.get_names().get(0));
+        System.out.println(loadEmergencyMeetingMessage.get_name().get(0));
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
