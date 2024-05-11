@@ -119,7 +119,6 @@ public class GameController {
         HttpEntity<List<InitTaskMessage>> requestEntity = new HttpEntity<>(initTaskMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
-
     @MessageMapping("/kill")
     public void handleKill(KillRequest killRequest) {
         String gameId = killRequest.getGameId();
