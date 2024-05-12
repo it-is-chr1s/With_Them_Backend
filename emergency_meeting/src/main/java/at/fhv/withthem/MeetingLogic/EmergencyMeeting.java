@@ -10,6 +10,7 @@ public class EmergencyMeeting {
     private boolean _isRunning;
     private int _coolDownTime;
     private List<String> _alivePlayers;
+    private boolean _votingStarted;
 
     private HashMap<String,String> _votes;
     public EmergencyMeeting(String gameId, List<String>playerNames){
@@ -21,8 +22,22 @@ public class EmergencyMeeting {
     }
 
     public void addVote(String voter, String nominated){
-        if(_votes.get(voter)!=null && _alivePlayers.contains(voter))
+        //didn't vote already and has right to vote = is alive
+        if(_votes.get(voter)==null && _alivePlayers.contains(voter))
             _votes.put(voter,nominated);
+    }
+    public  void  startVoting(){
+        deleteAllVotes();
+        _votingStarted=true;
+    }
+    public boolean everyoneVoted(){
+        return _alivePlayers.size() == _votes.size();
+    }
+    public void endVoting(){
+        _votingStarted=false;
+    }
+    private void deleteAllVotes(){
+        _votes.clear();
     }
     public String getGameId() {
         return _gameId;

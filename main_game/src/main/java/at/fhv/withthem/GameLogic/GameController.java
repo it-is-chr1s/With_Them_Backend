@@ -1,9 +1,6 @@
 package at.fhv.withthem.GameLogic;
 
-import at.fhv.withthem.GameLogic.Requests.ChangeColorRequest;
-import at.fhv.withthem.GameLogic.Requests.KillRequest;
-import at.fhv.withthem.GameLogic.Requests.MapRequest;
-import at.fhv.withthem.GameLogic.Requests.MoveRequest;
+import at.fhv.withthem.GameLogic.Requests.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Controller
 @CrossOrigin(origins = "http://localhost:5173")
@@ -118,6 +116,18 @@ public class GameController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<List<InitTaskMessage>> requestEntity = new HttpEntity<>(initTaskMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
+    }
+    @GetMapping("/game/{gameId}/players")
+    @ResponseBody
+    public PlayersRequest getPlayers(@PathVariable String gameId) {
+        Collection<Player> allPlayers = gameService.getGame(gameId).getPlayers().values();
+        List<Player> alivePlayers = allPlayers.stream().filter(Player::isAlive).toList();
+        List<Player> deadPlayers = allPlayers.stream().filter(player -> !player.isAlive()).toList();
+
+        List<PlayerInfo> alivePlayerInfo = alivePlayers.stream()
+                .map(player -> new PlayerInfo(player.getId(), player.getColor().getHexValue())).collect(Collectors.toList());
+
+        return new PlayersRequest(alivePlayerInfo, deadPlayers.stream().map(Player::getId).collect(Collectors.toList()));
     }
     @MessageMapping("/kill")
     public void handleKill(KillRequest killRequest) {

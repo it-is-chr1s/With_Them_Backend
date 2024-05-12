@@ -46,6 +46,22 @@ public class EmergencyMeetingHandler {
         }
         return _emergencyMeetings.get(gameId).getIsRunning();
     }
+    public void startVoting(String gameId){
+        if (meetingExists(gameId) && _emergencyMeetings.get(gameId).getIsRunning()){
+            _emergencyMeetings.get(gameId).startVoting();
+            scheduler.schedule(() -> {
+                _emergencyMeetings.get(gameId).endVoting();
+            }, 60, TimeUnit.SECONDS);
+        }
+    }
+    public void vote(String gameId, String voter, String nominated){
+        _emergencyMeetings.get(gameId).addVote(voter,nominated);
+        if(_emergencyMeetings.get(gameId).everyoneVoted())
+            _emergencyMeetings.get(gameId).endVoting();
+    }
+    public void finishVoting(String gameId){
+
+    }
     public boolean getStartable(String gameId){
         return _emergencyMeetings.get(gameId).isStartable();
     }

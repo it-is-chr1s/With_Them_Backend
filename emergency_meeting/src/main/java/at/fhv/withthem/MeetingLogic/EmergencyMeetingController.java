@@ -35,7 +35,7 @@ public class EmergencyMeetingController {
             _emergencyMeetingHandler.updateLivePlayers(loadEmergencyMeetingMessage.get_gameId(),loadEmergencyMeetingMessage.get_name());
             System.out.println("Updated:"+loadEmergencyMeetingMessage.get_gameId());
         }
-        System.out.println(loadEmergencyMeetingMessage.get_name().get(0));
+        System.out.println(String.join(" , ", loadEmergencyMeetingMessage.get_name()));
     }
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
