@@ -36,8 +36,8 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
-    @PostMapping("/TasksFinished")
-    public ResponseEntity<String> tasksFinished(@RequestBody String gameId) {
+    @PostMapping("/TasksFinished/{gameId}")
+    public ResponseEntity<String> tasksFinished(@PathVariable String gameId) {
         gameService.gameWon(gameId);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
