@@ -48,22 +48,22 @@ public class TasksController {
     public void stateOfTasks(@Payload String lobbyID) {
         System.out.println("requestStateOfTasks for " + lobbyID);
 
-        HashMap<Integer, String> tasks = new HashMap<>();
+        List<TaskState> taskStates = new ArrayList<>();
         for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(lobbyID)){
-            tasks.put(taskMessage.getId(), "available");
+            taskStates.add(new TaskState(taskMessage.getId(), "available", taskMessage.getTask()));
         }
         for (TaskMessage taskMessage : _tasksHandler.getActiveTasks(lobbyID)){
-            tasks.put(taskMessage.getId(), "active");
+            taskStates.add(new TaskState(taskMessage.getId(), "active", taskMessage.getTask()));
         }
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            System.out.println(mapper.writeValueAsString(tasks));
+            System.out.println(mapper.writeValueAsString(taskStates));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
-        _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/stateOfTasks", tasks);
+        _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/stateOfTasks", taskStates);
     }
 
     @MessageMapping("tasks/startTask")
