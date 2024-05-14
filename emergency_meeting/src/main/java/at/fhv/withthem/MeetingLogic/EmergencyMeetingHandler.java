@@ -50,15 +50,18 @@ public class EmergencyMeetingHandler {
         if (meetingExists(gameId) && _emergencyMeetings.get(gameId).getIsRunning() && !_emergencyMeetings.get(gameId).hasStarted()){
             _emergencyMeetings.get(gameId).startVoting();
             scheduler.schedule(() -> {
-                System.out.println("Voting ended");
-                _emergencyMeetings.get(gameId).endVoting();
-                //TODO:Kill suspect
+                if(_emergencyMeetings.get(gameId).getVotedStarted()){
+                    System.out.println("Voting ended");
+                    _emergencyMeetings.get(gameId).endVoting();
+                    //TODO:Kill suspect
+                }
             }, 60, TimeUnit.SECONDS);
         }
     }
     public String vote(String gameId, String voter, String nominated){
         _emergencyMeetings.get(gameId).addVote(voter,nominated);
         if(_emergencyMeetings.get(gameId).everyoneVoted()){
+            System.out.println("Voting ended");
             _emergencyMeetings.get(gameId).endVoting();
             //TODO:Kill suspect
             return getSuspect(gameId);

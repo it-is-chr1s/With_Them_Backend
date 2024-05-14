@@ -42,6 +42,7 @@ public class EmergencyMeeting {
     public void endVoting(){
         _votingStarted=false;
     }
+    public boolean getVotedStarted(){return _votingStarted;}
     private void deleteAllVotes(){
         _votes.clear();
     }
