@@ -48,6 +48,11 @@ public class TasksController {
     public void stateOfTasks(@Payload String lobbyID) {
         System.out.println("requestStateOfTasks for " + lobbyID);
 
+        if(!_tasksHandler.lobbyExists(lobbyID)){
+            System.out.println("Lobby " + lobbyID + " does not exist");
+            return;
+        }
+
         List<TaskState> taskStates = new ArrayList<>();
         for (TaskMessage taskMessage : _tasksHandler.getAvailableTasks(lobbyID)){
             taskStates.add(new TaskState(taskMessage.getId(), "available", taskMessage.getTask()));
