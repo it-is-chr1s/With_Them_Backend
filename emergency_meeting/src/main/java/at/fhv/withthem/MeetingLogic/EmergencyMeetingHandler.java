@@ -96,7 +96,7 @@ public class EmergencyMeetingHandler {
         if (suspects.size() == 1) {
             return suspects.iterator().next();
         } else {
-            return null; // No suspect if multiple players have the same count
+            return "NO ONE WAS KICKED"; // No suspect if multiple players have the same count
         }
     }
     public boolean getStartable(String gameId){

@@ -72,12 +72,16 @@ public class EmergencyMeetingController {
         String nominated = request.getNominated();
 
         String suspect=_emergencyMeetingHandler.vote(gameId, voter, nominated);
+        if(suspect!=null)
+            _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
+
         return new ResponseEntity<>(suspect, HttpStatus.OK);
     }
     @GetMapping("/meeting/{gameId}/suspect")
     @ResponseBody
     public String getSuspect(@PathVariable String gameId) {
-        System.out.println(_emergencyMeetingHandler.getSuspect(gameId));
-        return _emergencyMeetingHandler.getSuspect(gameId);
+        String suspect=_emergencyMeetingHandler.getSuspect(gameId);
+        _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
+        return suspect;
     }
 }
