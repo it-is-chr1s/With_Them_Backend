@@ -50,7 +50,9 @@ public class EmergencyMeetingHandler {
         if (meetingExists(gameId) && _emergencyMeetings.get(gameId).getIsRunning() && !_emergencyMeetings.get(gameId).hasStarted()){
             _emergencyMeetings.get(gameId).startVoting();
             scheduler.schedule(() -> {
+                System.out.println("Voting ended");
                 _emergencyMeetings.get(gameId).endVoting();
+                //TODO:Kill suspect
             }, 60, TimeUnit.SECONDS);
         }
     }
@@ -58,6 +60,7 @@ public class EmergencyMeetingHandler {
         _emergencyMeetings.get(gameId).addVote(voter,nominated);
         if(_emergencyMeetings.get(gameId).everyoneVoted()){
             _emergencyMeetings.get(gameId).endVoting();
+            //TODO:Kill suspect
             return getSuspect(gameId);
         }
         return null;
