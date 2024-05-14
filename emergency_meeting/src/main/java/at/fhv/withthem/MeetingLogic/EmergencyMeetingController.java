@@ -2,6 +2,8 @@ package at.fhv.withthem.MeetingLogic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -40,7 +42,6 @@ public class EmergencyMeetingController {
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
         System.out.println("Started for " + gameId);
-
         //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
         boolean running=_emergencyMeetingHandler.startMeeting(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
@@ -57,5 +58,26 @@ public class EmergencyMeetingController {
     @ResponseBody
     public boolean getStartable(@PathVariable String gameId) {
         return _emergencyMeetingHandler.getStartable(gameId);
+    }
+
+
+    @PostMapping("/meeting/startVoting")
+    public void startVoting(@RequestBody String gameId){
+        _emergencyMeetingHandler.startVoting(gameId);
+    }
+    @PostMapping("/meeting/vote")
+    public ResponseEntity<String> vote(@RequestBody VoteRequest request) {
+        String gameId = request.getGameId();
+        String voter = request.getVoter();
+        String nominated = request.getNominated();
+
+        String suspect=_emergencyMeetingHandler.vote(gameId, voter, nominated);
+        return new ResponseEntity<>(suspect, HttpStatus.OK);
+    }
+    @GetMapping("/meeting/{gameId}/suspect")
+    @ResponseBody
+    public String getSuspect(@PathVariable String gameId) {
+        System.out.println(_emergencyMeetingHandler.getSuspect(gameId));
+        return _emergencyMeetingHandler.getSuspect(gameId);
     }
 }

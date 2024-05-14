@@ -26,9 +26,15 @@ public class EmergencyMeeting {
         if(_votes.get(voter)==null && _alivePlayers.contains(voter))
             _votes.put(voter,nominated);
     }
+    public boolean hasStarted(){
+        return _votingStarted;
+    }
     public  void  startVoting(){
         deleteAllVotes();
         _votingStarted=true;
+    }
+    public HashMap<String, String> getVotes() {
+        return _votes;
     }
     public boolean everyoneVoted(){
         return _alivePlayers.size() == _votes.size();
