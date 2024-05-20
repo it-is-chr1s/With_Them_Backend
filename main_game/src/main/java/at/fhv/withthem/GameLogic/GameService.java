@@ -295,7 +295,7 @@ public class GameService {
             }
         }
         for(Player player : getGame(gameId).getPlayers().values()) {
-            player.setPosition(new Position(3,3));
+            player.setPosition(new Position(43,10));
             messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
             messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
         }
