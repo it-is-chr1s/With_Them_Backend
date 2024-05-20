@@ -117,16 +117,22 @@ public class PolusMap extends GameMap{
                 setWalls(66, 34, 4, 4); // 75
                 setWalls(65, 38, 5, 8); // 76
 
-                /*
-                setMeetingPoint(15, 3);
-                //type should not include String %id
-                setTask(7, 7, "Connecting Wires", 1);
-                setTask(11, 5, "File Download", 2);
-                setTask(11, 9, "File Upload", 2);
+                setMeetingPoint(43, 10);
 
-                setTask(15, 7, "Connecting Wires", 3);
-                setTask(19, 5, "File Download", 4);
-                setTask(19, 9, "File Upload", 4);*/
+                setTask(55, 29, "Connecting Wires", 1); // Admin
+                setTask(35, 1, "Connecting Wires", 2); // Cafeteria
+                setTask(52, 44, "Connecting Wires", 3); // Communications
+                setTask(30, 27, "Connecting Wires", 4); // Electrical
+                setTask(10, 14, "Connecting Wires", 5); // Align Engine
+                setTask(9, 38, "Connecting Wires", 6); // Align Engine
+                setTask(33, 22, "Connecting Wires", 7); // MedBay
+                setTask(73, 20, "Connecting Wires", 8); // Navigation
+                setTask(77, 18, "File Download", 9); // Navigation
+                setTask(79, 18, "File Upload", 9); // Navigation
+                setTask(80, 20, "Connecting Wires", 10); // Navigation
+                setTask(56, 18, "Connecting Wires", 11); // o2
+                setTask(0, 23, "Connecting Wires", 12); // o2
+                // Security, Shields, Storage, Weapons are not implemented
         }
 }
 
