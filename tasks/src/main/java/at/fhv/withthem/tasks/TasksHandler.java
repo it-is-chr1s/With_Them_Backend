@@ -4,7 +4,12 @@ import at.fhv.withthem.tasks.task.Reaction;
 import at.fhv.withthem.tasks.task.TaskConnectingWires;
 import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -87,6 +92,18 @@ public class TasksHandler {
                 _finishedTasks.put(lobby, _finishedTasks.get(lobby) + 1);
                 break;
             }
+        }
+
+        if(_availableTasks.get(lobby).isEmpty() && _activeTasks.get(lobby).isEmpty()){
+            System.out.println("All tasks for lobby " + lobby + " finished");
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:4000/TasksFinished/" + lobby;
+
+            // Make POST request to the endpoint
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(lobby, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
         }
     }
 
