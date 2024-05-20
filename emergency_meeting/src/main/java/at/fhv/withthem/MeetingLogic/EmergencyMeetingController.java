@@ -2,13 +2,13 @@ package at.fhv.withthem.MeetingLogic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @Controller
 @RestController
@@ -42,14 +42,12 @@ public class EmergencyMeetingController {
     @MessageMapping("meeting/startMeeting")
     public void startMeeting(@Payload String gameId) {
         System.out.println("Started for " + gameId);
-        //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
         boolean running=_emergencyMeetingHandler.startMeeting(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
     }
     @MessageMapping("meeting/endMeeting")
     public void endMeeting(@Payload String gameId) {
         System.out.println("Ended for " + gameId);
-        //_messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/startable", true);
         boolean running=_emergencyMeetingHandler.endMeeting(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/running", running);
     }
@@ -72,8 +70,10 @@ public class EmergencyMeetingController {
         String nominated = request.getNominated();
 
         String suspect=_emergencyMeetingHandler.vote(gameId, voter, nominated);
-        if(suspect!=null)
+        if(suspect!=null){
             _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
+            kickOut(gameId,suspect);
+        }
 
         return new ResponseEntity<>(suspect, HttpStatus.OK);
     }
@@ -82,6 +82,22 @@ public class EmergencyMeetingController {
     public String getSuspect(@PathVariable String gameId) {
         String suspect=_emergencyMeetingHandler.getSuspect(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
+        if(!suspect.equals("NO ONE WAS KICKED"))
+            kickOut(gameId,suspect);
         return suspect;
+    }
+
+    public void kickOut(String gameId, String suspect){
+        String killRequest = "{\n" +
+                "  \"gameId\": \"" + gameId + "\",\n" +
+                "  \"killerId\": \"" + suspect + "\"\n" +
+                "}";
+        String url = "http://localhost:4000/kickOut";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(killRequest, headers);
+        restTemplate.postForEntity(url, requestEntity, String.class);
     }
 }

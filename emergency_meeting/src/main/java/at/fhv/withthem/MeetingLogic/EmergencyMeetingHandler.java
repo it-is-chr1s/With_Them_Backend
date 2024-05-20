@@ -44,7 +44,7 @@ public class EmergencyMeetingHandler {
             }, 10, TimeUnit.SECONDS);
             return false;
         }
-        return _emergencyMeetings.get(gameId).getIsRunning();
+        return true;
     }
     public void startVoting(String gameId){
         if (meetingExists(gameId) && _emergencyMeetings.get(gameId).getIsRunning() && !_emergencyMeetings.get(gameId).hasStarted()){
@@ -53,7 +53,6 @@ public class EmergencyMeetingHandler {
                 if(_emergencyMeetings.get(gameId).getVotedStarted()){
                     System.out.println("Voting ended");
                     _emergencyMeetings.get(gameId).endVoting();
-                    //TODO:Kill suspect
                 }
             }, 60, TimeUnit.SECONDS);
         }
@@ -63,7 +62,6 @@ public class EmergencyMeetingHandler {
         if(_emergencyMeetings.get(gameId).everyoneVoted()){
             System.out.println("Voting ended");
             _emergencyMeetings.get(gameId).endVoting();
-            //TODO:Kill suspect
             return getSuspect(gameId);
         }
         return null;

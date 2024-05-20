@@ -23,14 +23,9 @@ public class GameController {
 
     @RequestMapping(method= RequestMethod.POST, value="/createGame")
     public ResponseEntity<String> createGame(@RequestParam("hostName") String requestBody) {
-        //@PostMapping("/createGame")
-        //public ResponseEntity<String> createGame(@RequestBody HostNameRequest requestBody) {
-        System.out.println(requestBody);
+        System.out.println("RequestBody in createGame:"+requestBody);
         String gameId = gameService.registerGame(requestBody);
         System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
-
-
-
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
@@ -145,6 +140,13 @@ public class GameController {
         } else {
             messagingTemplate.convertAndSend("/topic/" + gameId + "/killFailed", "Kill failed for player " + killerId);
         }*/
+    }
+    @PostMapping("/kickOut")
+    public void kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
+        String gameId=kickOutRequest.getGameId();
+        gameService.kickOutPlayer(gameId,kickOutRequest.getKillerId());
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+
     }
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
         List<String>alivePlayers=new LinkedList<>();

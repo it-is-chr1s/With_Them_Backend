@@ -256,6 +256,16 @@ public class GameService {
         return false;
     }
 
+    public void kickOutPlayer(String gameId, String kickedOutPlayer){
+        Player kickedOut=getGame(gameId).getPlayers().get(kickedOutPlayer);
+        kickedOut.kill();
+        int kickedOutPlayerRoll= kickedOut.getRole();
+        System.out.println("Roll of kicked player was:"+ kickedOutPlayer);
+        if(kickedOutPlayerRoll==1)
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Imposter");
+        else
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Crew Mate");
+    }
     private boolean isInKillRange(Position killer, Position target) {
         int distance = (int)(Math.abs(killer.getX() - target.getX()) + Math.abs(killer.getY() - target.getY()));
         return distance <= 1;
