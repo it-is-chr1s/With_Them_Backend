@@ -57,7 +57,7 @@ public class GameService {
                 }
             });
             if(game.isRunning()) {
-                GameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
+                gameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
             }
         });
     }
@@ -90,8 +90,12 @@ public class GameService {
         return -1;
     }
 
-    private void GameOver(String gameId){
+    private void gameOver(String gameId){
         int won = GameWonByPlayersAlive(gameId);
+        gameOver(gameId, won);
+    }
+
+    public void gameOver(String gameId, int won){
         if(won == -1){
             return;
         }
@@ -102,11 +106,10 @@ public class GameService {
             gameWon(gameId);
             messagingTemplate.convertAndSend("/topic/"+gameId+"/gameOver", "Imposter");
         }
+
         getGame(gameId).setRunning(false);
         getGame(gameId).getPlayers().values().forEach(player -> {player.setRole(0);  player.setAlive(true); player.setPosition(new Position(0,0));});
         getGame(gameId).setGameMap(new LobbyMap());
-
-
         List<Position> wallPositions = getWallPositions(gameId);
         List<TaskPosition> taskPositions = getTaskPositions(gameId);
         Map<String, Object> mapLayout = new HashMap<>();
@@ -117,6 +120,7 @@ public class GameService {
 
         messagingTemplate.convertAndSend("/topic/" +gameId+"/mapLayout", mapLayout);
     }
+
 
     public synchronized boolean movePlayer(String gameId, String playerId, Direction direction, float speed) {
         Player player = getPlayers(gameId).get(playerId);
