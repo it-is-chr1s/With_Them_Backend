@@ -294,13 +294,28 @@ public class GameService {
                 }
             }
         }
-        for(Player player : getGame(gameId).getPlayers().values()) {
-            player.setPosition(new Position(43,10));
-            messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
-            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
-        }
+
+        spawnPlayers(gameId);
+
         System.out.println("Game started!");
         getGame(gameId).setGameMap(new PolusMap());
         getGame(gameId).setRunning(true);
+    }
+
+    private void spawnPlayers(String gameId){
+        final double distance = 1.5;
+        final double centerX = 43.5;
+        final double centerY = 10.5;
+        final int n = getGame(gameId).getPlayers().values().size();
+        final double radius = distance / (2 * Math.sin(Math.PI / n));
+        int i = 0;
+        for(Player player : getGame(gameId).getPlayers().values()) {
+            double angle = 2 * Math.PI * i++ / n;
+            double x = centerX + radius * Math.cos(angle);
+            double y = centerY + radius * Math.sin(angle);
+            player.setPosition(new Position((float) x, (float) y));
+            messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
+            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
+        }
     }
 }
