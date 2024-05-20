@@ -64,7 +64,7 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);
+            gameService.registerPlayer(gameId, playerName, Colors.GRAY);
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
@@ -77,7 +77,7 @@ public class GameController {
         Colors color = colorRequest.getColor();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+            gameService.registerPlayer(gameId, playerName, Colors.GRAY);/*, colore*/
         }
 
         gameService.updatePlayerColor(gameId, playerName, color);

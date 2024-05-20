@@ -166,7 +166,8 @@ public class GameService {
         return getPlayers(gameId).containsKey(playerId);
     }
 
-    public void registerPlayer(String gameID, String playerId, Position startPosition, Colors color) {
+    public void registerPlayer(String gameID, String playerId, Colors color) {
+        Position startPosition = new Position(4.5f, 4.5f);
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
