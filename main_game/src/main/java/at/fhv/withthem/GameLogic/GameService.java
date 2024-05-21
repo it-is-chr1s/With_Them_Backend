@@ -264,10 +264,11 @@ public class GameService {
         Player kickedOut=getGame(gameId).getPlayers().get(kickedOutPlayer);
         kickedOut.kill();
         int kickedOutPlayerRoll= kickedOut.getRole();
-        System.out.println("Roll of kicked player was:"+ kickedOutPlayer);
-        if(kickedOutPlayerRoll==1)
+        System.out.println("Roll of kicked player was:"+ kickedOutPlayerRoll);
+        if(kickedOutPlayerRoll==1) {
+            System.out.println("/topic/" + gameId + "/kickedOutRoll");
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Imposter");
-        else
+        }        else
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Crew Mate");
     }
     private boolean isInKillRange(Position killer, Position target) {

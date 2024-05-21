@@ -87,7 +87,7 @@ public class EmergencyMeetingController {
         return suspect;
     }
 
-    public void kickOut(String gameId, String suspect){
+    public void kickOut(String gameId, String suspect) {
         String killRequest = "{\n" +
                 "  \"gameId\": \"" + gameId + "\",\n" +
                 "  \"killerId\": \"" + suspect + "\"\n" +
@@ -100,4 +100,5 @@ public class EmergencyMeetingController {
         HttpEntity<String> requestEntity = new HttpEntity<>(killRequest, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
+
 }

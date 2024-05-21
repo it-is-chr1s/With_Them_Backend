@@ -142,11 +142,11 @@ public class GameController {
         }*/
     }
     @PostMapping("/kickOut")
-    public void kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
-        String gameId=kickOutRequest.getGameId();
-        gameService.kickOutPlayer(gameId,kickOutRequest.getKillerId());
-        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
-
+    public ResponseEntity<Void> kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
+        String gameId = kickOutRequest.getGameId();
+        gameService.kickOutPlayer(gameId, kickOutRequest.getKillerId());
+        loadEmergencyMeeting(gameId, gameService.getPlayers(gameId));
+        return ResponseEntity.ok().build(); // Return a 200 OK response with no body
     }
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
         List<String>alivePlayers=new LinkedList<>();
