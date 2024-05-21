@@ -167,7 +167,7 @@ public class GameService {
     }
 
     public void registerPlayer(String gameID, String playerId, Colors color) {
-        Position startPosition = new Position(4.5f, 4.5f);
+        Position startPosition = new Position(6f, 6f);
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
@@ -305,13 +305,13 @@ public class GameService {
 
     private void spawnPlayers(String gameId){
         final double distance = 1.5;
-        final double centerX = 43.5;
-        final double centerY = 10.5;
+        final double centerX = 44.5;
+        final double centerY = 11.5;
         final int n = getGame(gameId).getPlayers().values().size();
         final double radius = distance / (2 * Math.sin(Math.PI / n));
         int i = 0;
         for(Player player : getGame(gameId).getPlayers().values()) {
-            double angle = 2 * Math.PI * i++ / n;
+            double angle = (2 * Math.PI * i++ / n) - Math.PI / 2;
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
             player.setPosition(new Position((float) x, (float) y));
