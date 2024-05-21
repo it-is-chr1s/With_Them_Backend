@@ -31,7 +31,7 @@ public class GameService {
         Player player = getPlayers(gameId).get(playerId);
         if (player != null && colors!=player.getColor()) {
             player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue(), player.isAlive()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue(), player.isAlive(), player.getDeathPosition()));
         }
     }
 
@@ -48,9 +48,9 @@ public class GameService {
 
                     Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-                    if (canMoveTo(gameId, newPosition)) {
+                    if ((player.isAlive() && canMoveTo(gameId, newPosition)) || !player.isAlive() && canGhostMoveTo(gameId, newPosition)) {
                         player.setPosition(newPosition);
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
                     }
@@ -108,7 +108,7 @@ public class GameService {
         }
 
         getGame(gameId).setRunning(false);
-        getGame(gameId).getPlayers().values().forEach(player -> {player.setRole(0);  player.setAlive(true); player.setPosition(new Position(0,0));});
+        getGame(gameId).getPlayers().values().forEach(player -> {player.setRole(0);  player.setAlive(true); player.setPosition(new Position(5,5));});
         getGame(gameId).setGameMap(new LobbyMap());
         List<Position> wallPositions = getWallPositions(gameId);
         List<TaskPosition> taskPositions = getTaskPositions(gameId);
@@ -141,6 +141,11 @@ public class GameService {
                 && !map.isWall((int)position.getX(), (int)position.getY());
     }
 
+    private boolean canGhostMoveTo(String gameId, Position position) {
+        GameMap map =getMap(gameId);
+        return map.isWithinBounds((int)position.getX(), (int)position.getY());
+    }
+
     private boolean canDoTask(String gameId, Position position){
         return getMap(gameId).isTask((int)position.getX(), (int)position.getY());
     }
@@ -171,7 +176,7 @@ public class GameService {
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
-            messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
+            messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         });
     }
 
@@ -253,7 +258,7 @@ public class GameService {
                     target.kill();
                     killer.recordKill();
                     System.out.println("kill succesful");
-                    messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(target.getId(), target.getPosition(), target.getColor().toString(), target.isAlive()));
+                    messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(target.getId(), target.getPosition(), target.getColor().toString(), target.isAlive(), target.getDeathPosition()));
                     return true;
                 }
             }
@@ -316,7 +321,7 @@ public class GameService {
             double y = centerY + radius * Math.sin(angle);
             player.setPosition(new Position((float) x, (float) y));
             messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
-            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive()));
+            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         }
     }
 }
