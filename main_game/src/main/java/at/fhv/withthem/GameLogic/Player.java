@@ -6,6 +6,7 @@ public class Player {
     private String _name;
     private Colors _color;
     private Position _position;
+    private Position _deathPosition;
     private Direction _direction;
 
     private int _role = 0;
@@ -20,6 +21,7 @@ public class Player {
         this._position = position;
         this._direction = Direction.NONE;
         this._color=color;
+        this._deathPosition = new Position(-1, -1);
     }
 
     public boolean canKillAgain() {
@@ -34,7 +36,10 @@ public class Player {
     public void setRole(int role) {_role = role;}
 
     public boolean isAlive() {return _isAlive;}
-    public void kill() {_isAlive = false;}
+    public void kill() {
+        _isAlive = false;
+        _deathPosition = new Position(_position.getX(), _position.getY());
+    }
 
     public String getId() {
         return _id;
@@ -74,5 +79,13 @@ public class Player {
 
     public void setAlive(boolean alive) {
         _isAlive = alive;
+    }
+
+    public Position getDeathPosition() {
+        return _deathPosition;
+    }
+
+    public void setDeathPosition(Position deathPosition) {
+        _deathPosition = deathPosition;
     }
 }

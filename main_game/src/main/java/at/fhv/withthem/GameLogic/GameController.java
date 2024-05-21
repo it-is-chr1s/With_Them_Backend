@@ -57,7 +57,7 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);
+            gameService.registerPlayer(gameId, playerName, Colors.GRAY);
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
@@ -70,7 +70,7 @@ public class GameController {
         Colors color = colorRequest.getColor();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, new Position(0, 0), Colors.GRAY);/*, colore*/
+            gameService.registerPlayer(gameId, playerName, Colors.GRAY);/*, colore*/
         }
 
         gameService.updatePlayerColor(gameId, playerName, color);
@@ -170,5 +170,11 @@ public class GameController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<LoadEmergencyMeetingMessage> requestEntity = new HttpEntity<>(loadEmergencyMeetingMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
+    }
+
+    @GetMapping("/meetingEnded/{gameId}")
+    public void handleMeetingEnd(@PathVariable String gameId) {
+        System.out.println("Emergency meeting ended for game: " + gameId);
+        gameService.resetDeathPositions(gameId);
     }
 }

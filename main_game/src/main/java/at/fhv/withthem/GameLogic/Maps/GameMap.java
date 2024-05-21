@@ -38,6 +38,14 @@ public abstract class GameMap {
         _grid[y][x] = "Wall";
     }
 
+    public void setWalls(int x, int y, int width, int height) {
+        for (int i = y; i < y + height; i++) {
+            for (int j = x; j < x + width; j++) {
+                setWall(j, i);
+            }
+        }
+    }
+
     public boolean isWall(int x, int y) {
         return (_grid[y][x] != null && _grid[y][x].equals("Wall"));
     }

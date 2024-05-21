@@ -19,7 +19,7 @@ public class Game {
     public Game(String gameId, GameMap map, String host){
         _gameId=gameId;
         this._map =map;
-        _host=new Player(host,new Position(1,1),Colors.BLUE);
+        _host=new Player(host,new Position(6f,6f),Colors.BLUE);
         _players.put(host, _host);
         _settings=new Settings();
         _isRunning=false;
