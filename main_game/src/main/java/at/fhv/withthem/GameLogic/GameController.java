@@ -160,4 +160,10 @@ public class GameController {
         HttpEntity<LoadEmergencyMeetingMessage> requestEntity = new HttpEntity<>(loadEmergencyMeetingMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
+
+    @GetMapping("/meetingEnded/{gameId}")
+    public void handleMeetingEnd(@PathVariable String gameId) {
+        System.out.println("Emergency meeting ended for game: " + gameId);
+        gameService.resetDeathPositions(gameId);
+    }
 }

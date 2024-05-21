@@ -320,8 +320,26 @@ public class GameService {
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
             player.setPosition(new Position((float) x, (float) y));
-            messagingTemplate.convertAndSend("/topic/" +gameId+ "/" + player.getId(), player.getRole());
-            messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/" + player.getId(), player.getRole());
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         }
     }
+
+    public void resetDeathPositions(String gameId) {
+        Game game = games.get(gameId);
+        if (game != null) {
+            game.getPlayers().values().forEach(player -> {
+                player.setDeathPosition(new Position(-1, -1));
+            });
+            updateAllPlayers(gameId);
+        }
+    }
+
+    private void updateAllPlayers(String gameId) {
+        Game game = games.get(gameId);
+        game.getPlayers().forEach((id, player) -> {
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
+        });
+    }
+
 }
