@@ -53,6 +53,7 @@ public class GameService {
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
                         messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
+                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
                     }
                 }
             });
@@ -153,6 +154,14 @@ public class GameService {
     private boolean canCallEmergencyMeeting(String gameId, Position position){
         return getMap(gameId).isMeetingPoint((int)position.getX(),(int)position.getY());
     }
+
+    private boolean canCallEmergencyMeetingReport(String gameId, Position position) {
+        Boolean corpe= getPlayers(gameId).values().stream()
+                .anyMatch(player -> ((int)position.getX()==(int)player.getDeathPosition().getX()&&(int)position.getY()==(int)player.getDeathPosition().getY()));
+        System.out.println(corpe);
+        return corpe;
+    }
+
     private Position calculateNewPosition(Position currentPosition, Direction direction, float speed) {
         float newX = currentPosition.getX() + direction.getDx() * speed;
         float newY = currentPosition.getY() + direction.getDy() * speed;
