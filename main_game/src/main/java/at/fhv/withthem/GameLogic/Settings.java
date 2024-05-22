@@ -15,7 +15,7 @@ public class Settings {
         public Settings(){
             _speed=1.0;
             _maxPlayers=4;
-            _minPlayers=2;
+            _minPlayers=3;
             _timeLimit=20;
             _killRange=0.5;
             _roles.put(1, 1);
@@ -68,5 +68,13 @@ public class Settings {
 
         public void setRoles(HashMap<Integer, Integer> roles) {
                 _roles = roles;
+        }
+
+        @Override
+        public String toString() {
+                return "Settings{" +
+                        " \"maxPlayers\":" + _maxPlayers +
+                        ", \"imposters\":" + _roles.get(1) +
+                        '}';
         }
 }

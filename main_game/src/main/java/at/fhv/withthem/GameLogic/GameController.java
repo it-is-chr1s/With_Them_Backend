@@ -29,6 +29,22 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
+    @GetMapping("/ableToJoin/{gameId}/{playerName}")
+    public ResponseEntity<Boolean> getGame(@PathVariable String gameId, @PathVariable String playerName) {
+
+        if (gameService.getGame(gameId) == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        };
+        if(gameService.getGame(gameId).getPlayers().size() >= gameService.getGame(gameId).getSettings().getMaxPlayers()) {
+            return new ResponseEntity<>(false,HttpStatus.OK);
+        }
+        if (gameService.getGame(gameId).getPlayers().containsKey(playerName)) {
+            return new ResponseEntity<>(false,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(true   , HttpStatus.OK);
+    }
+
     @PostMapping("/TasksFinished/{gameId}")
     public ResponseEntity<String> tasksFinished(@PathVariable String gameId) {
         gameService.gameOver(gameId,0);
@@ -43,6 +59,53 @@ public class GameController {
         sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
+
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/settings/{gameId}/{playerName}/{settings}/{value}")
+    public ResponseEntity<String> setSettings(@PathVariable String gameId, @PathVariable String playerName, @PathVariable String settings, @PathVariable String value) {
+        if (!gameService.getGame(gameId).getHost().equals(playerName)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        switch (settings) {
+            case "maxPlayers":
+                try{
+                    Integer.parseInt(value);
+                }catch (NumberFormatException e) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                if(Integer.parseInt(value)<0) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                gameService.setMaxPlayers(gameId, Integer.parseInt(value));
+                break;
+            case "Imposters":
+                try {
+                    Integer.parseInt(value);
+                }
+                catch (NumberFormatException e) {
+                        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                if(Integer.parseInt(value)<0) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                if(Integer.parseInt(value)>gameService.getSettings(gameId).getMaxPlayers()) {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+                gameService.setImposters(gameId, Integer.parseInt(value));
+                break;
+         }
+        return new ResponseEntity<>(gameId, HttpStatus.OK);
+    }
+
+    @GetMapping("/settings/{gameId}")
+    public ResponseEntity<Settings> getSettings(@PathVariable("gameId") String gameId) {
+        System.out.println(gameId);
+        if(gameId==null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(gameService.getSettings(gameId), HttpStatus.OK);
+    }
+
 
     @Autowired
     public GameController(GameService gameService, SimpMessagingTemplate messagingTemplate) {

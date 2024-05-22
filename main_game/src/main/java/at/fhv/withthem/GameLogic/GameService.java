@@ -362,4 +362,15 @@ public class GameService {
         });
     }
 
+    public Settings getSettings(String gameId) {
+        return games.get(gameId).getSettings();
+    }
+
+    public void setImposters(String gameId, int i) {
+        games.get(gameId).getSettings().getRoles().put(1, i);
+    }
+
+    public void setMaxPlayers(String gameId, int i) {
+        games.get(gameId).getSettings().setMaxPlayers(i);
+    }
 }
