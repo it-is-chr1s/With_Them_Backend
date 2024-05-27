@@ -67,10 +67,11 @@ public class EmergencyMeetingHandler {
         return null;
     }
     public String getSuspect(String gameId){
-        List<String> nominatedPlayers =_emergencyMeetings.get(gameId).getVotes().values().stream().toList();
-        if (nominatedPlayers == null || nominatedPlayers.isEmpty()) {
-            return null; // No suspect if the list is empty
-        }
+        List<String> nominatedPlayers;
+        if(_emergencyMeetings.get(gameId).getVotes()!=null)
+            nominatedPlayers =_emergencyMeetings.get(gameId).getVotes().values().stream().toList();
+        else
+            return null;
 
         Map<String, Integer> playerCounts = new HashMap<>();
 

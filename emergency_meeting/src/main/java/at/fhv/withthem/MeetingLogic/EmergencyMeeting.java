@@ -23,7 +23,7 @@ public class EmergencyMeeting {
 
     public void addVote(String voter, String nominated){
         //didn't vote already and has right to vote = is alive
-        if(_votes.get(voter)==null && _alivePlayers.contains(voter))
+        if(_votes.get(voter)==null && _alivePlayers.contains(voter) && _isRunning)
             _votes.put(voter,nominated);
     }
     public boolean hasStarted(){

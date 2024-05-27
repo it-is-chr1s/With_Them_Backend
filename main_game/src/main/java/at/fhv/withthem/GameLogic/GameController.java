@@ -209,6 +209,7 @@ public class GameController {
         String gameId = kickOutRequest.getGameId();
         gameService.kickOutPlayer(gameId, kickOutRequest.getKillerId());
         loadEmergencyMeeting(gameId, gameService.getPlayers(gameId));
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         return ResponseEntity.ok().build(); // Return a 200 OK response with no body
     }
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){
