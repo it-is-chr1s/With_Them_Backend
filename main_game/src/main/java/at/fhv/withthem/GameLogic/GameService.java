@@ -3,7 +3,6 @@ package at.fhv.withthem.GameLogic;
 import at.fhv.withthem.GameLogic.Maps.GameMap;
 import at.fhv.withthem.GameLogic.Maps.LobbyMap;
 import at.fhv.withthem.GameLogic.Maps.PolusMap;
-import at.fhv.withthem.GameLogic.Requests.MapRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GameService {
-    private final ConcurrentHashMap<String, Game> games = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Game> _games = new ConcurrentHashMap<>();
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -38,7 +37,7 @@ public class GameService {
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
 
-        games.forEach((gameId, game) -> {
+        _games.forEach((gameId, game) -> {
             ConcurrentHashMap<String, Player> players = game.getPlayers();
             players.forEach((playerId, player) -> {
                 if (player.hasMoved()) {
@@ -64,7 +63,7 @@ public class GameService {
     }
 
     public void gameWon(String gameId){
-        games.get(gameId).setWon(true);
+        _games.get(gameId).setWon(true);
     }
 
     private int GameWonByPlayersAlive(String gameId) {
@@ -180,8 +179,9 @@ public class GameService {
         return getPlayers(gameId).containsKey(playerId);
     }
 
-    public void registerPlayer(String gameID, String playerId, Colors color) {
+    public void registerPlayer(String gameID, String playerId) {
         Position startPosition = new Position(6f, 6f);
+        Colors color=_games.get(gameID).getAvailableColor();
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
@@ -192,7 +192,7 @@ public class GameService {
     public String registerGame(String hostName) {
         String gameId=generateGameId();
         GameMap map=new LobbyMap();
-        games.put(gameId, new Game(gameId, map, hostName));
+        _games.put(gameId, new Game(gameId, map, hostName));
         return gameId;
     }
 
@@ -248,7 +248,7 @@ public class GameService {
     }
 
     public Game getGame(String gameId) {
-        return games.get(gameId);
+        return _games.get(gameId);
     }
     public GameMap getMap(String gameId) {
         return getGame(gameId).getMap();
@@ -293,7 +293,7 @@ public class GameService {
 
 
     public boolean isAlive(String gameId, String payerId) {
-        return games.get(gameId).getPlayers().get(payerId).isAlive();
+        return _games.get(gameId).getPlayers().get(payerId).isAlive();
     }
 
     public boolean isCrewmate(String gameId, String payerId) {
@@ -346,7 +346,7 @@ public class GameService {
     }
 
     public void resetDeathPositions(String gameId) {
-        Game game = games.get(gameId);
+        Game game = _games.get(gameId);
         if (game != null) {
             game.getPlayers().values().forEach(player -> {
                 player.setDeathPosition(new Position(-1, -1));
@@ -356,21 +356,21 @@ public class GameService {
     }
 
     private void updateAllPlayers(String gameId) {
-        Game game = games.get(gameId);
+        Game game = _games.get(gameId);
         game.getPlayers().forEach((id, player) -> {
             messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         });
     }
 
     public Settings getSettings(String gameId) {
-        return games.get(gameId).getSettings();
+        return _games.get(gameId).getSettings();
     }
 
     public void setImposters(String gameId, int i) {
-        games.get(gameId).getSettings().getRoles().put(1, i);
+        _games.get(gameId).getSettings().getRoles().put(1, i);
     }
 
     public void setMaxPlayers(String gameId, int i) {
-        games.get(gameId).getSettings().setMaxPlayers(i);
+        _games.get(gameId).getSettings().setMaxPlayers(i);
     }
 }

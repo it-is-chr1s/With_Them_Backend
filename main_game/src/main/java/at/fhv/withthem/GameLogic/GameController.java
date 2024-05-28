@@ -120,7 +120,7 @@ public class GameController {
         Direction direction = moveRequest.getDirection();
 
         if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, Colors.GRAY);
+            gameService.registerPlayer(gameId, playerName);
         }
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
@@ -131,10 +131,6 @@ public class GameController {
         String gameId=colorRequest.getGameId();
         String playerName = colorRequest.getName();
         Colors color = colorRequest.getColor();
-
-        if (!gameService.playerExists(gameId, playerName)) {
-            gameService.registerPlayer(gameId, playerName, Colors.GRAY);/*, colore*/
-        }
 
         gameService.updatePlayerColor(gameId, playerName, color);
     }

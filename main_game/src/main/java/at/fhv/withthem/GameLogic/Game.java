@@ -2,6 +2,8 @@ package at.fhv.withthem.GameLogic;
 
 import at.fhv.withthem.GameLogic.Maps.GameMap;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Game {
@@ -66,5 +68,22 @@ public class Game {
 
     public String getHost() {
         return _host.getName();
+    }
+
+    public List<Colors> getUsedColors(){
+        List<Colors> usedColors = new LinkedList<>();
+        for (Player player : _players.values()) {
+            usedColors.add(player.getColor());
+        }
+        return usedColors;
+    }
+    public Colors getAvailableColor() {
+        List<Colors>usedColors=getUsedColors();
+        for (Colors color : Colors.values()) {
+            if (!usedColors.contains(color)) {
+                return color;
+            }
+        }
+        return null; // No available color
     }
 }
