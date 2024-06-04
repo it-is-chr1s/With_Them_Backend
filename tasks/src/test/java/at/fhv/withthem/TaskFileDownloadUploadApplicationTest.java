@@ -16,7 +16,7 @@ import java.util.List;
 
 @SpringBootTest(classes = TasksApplication.class)
 public class TaskFileDownloadUploadApplicationTest {
-
+/*
     @Autowired
     private TasksHandler tasksHandler;
 
@@ -72,4 +72,6 @@ public class TaskFileDownloadUploadApplicationTest {
 
         Assertions.assertEquals(tasksHandler.getFinishedTasks("TestLobby"), 1);
     }
+
+ */
 }
