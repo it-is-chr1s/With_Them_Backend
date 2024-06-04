@@ -70,7 +70,7 @@ public class Game {
         return _host.getName();
     }
 
-    public List<Colors> getUsedColors(){
+    public List<Colors> getOccupiedColors(){
         List<Colors> usedColors = new LinkedList<>();
         for (Player player : _players.values()) {
             usedColors.add(player.getColor());
@@ -78,12 +78,19 @@ public class Game {
         return usedColors;
     }
     public Colors getAvailableColor() {
-        List<Colors>usedColors=getUsedColors();
+        List<Colors>usedColors= getOccupiedColors();
         for (Colors color : Colors.values()) {
             if (!usedColors.contains(color)) {
                 return color;
             }
         }
         return null; // No available color
+    }
+    public boolean icColorAvailable(Colors c){
+        for (Player player : _players.values()) {
+           if( player.getColor()== c)
+               return false;
+        }
+        return  true;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class GameService {
@@ -26,11 +27,21 @@ public class GameService {
         }
     }
 
-    public synchronized void updatePlayerColor(String gameId, String playerId, Colors colors) {
+    public List<String> getOccupiedColors(String gameId) {
+        Game game = _games.get(gameId);
+        if (game == null) {
+            throw new IllegalArgumentException("Game with ID " + gameId + " not found.");
+        }
+        return game.getOccupiedColors().stream()
+                .map(Colors::getHexValue)
+                .collect(Collectors.toList());
+    }
+    public synchronized void updatePlayerColor(String gameId, String playerId, Colors color) {
         Player player = getPlayers(gameId).get(playerId);
-        if (player != null && colors!=player.getColor()) {
-            player.setColor(colors);
-            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), colors.getHexValue(), player.isAlive(), player.getDeathPosition()));
+        if (player != null && color!=player.getColor() && _games.get(gameId).icColorAvailable(color)) {
+            player.setColor(color);
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/position", new PlayerPosition(playerId, player.getPosition(), color.getHexValue(), player.isAlive(), player.getDeathPosition()));
+            messagingTemplate.convertAndSend("/topic/"+gameId+"/occupiedColors", getOccupiedColors(gameId));
         }
     }
 
@@ -167,10 +178,6 @@ public class GameService {
         return new Position(newX, newY);
     }
 
-    public Player getPlayer(String gameId,String playerId) {
-        return getPlayers(gameId).get(playerId);
-    }
-
     public ConcurrentHashMap<String, Player> getPlayers(String gameId){
         return getGame(gameId).getPlayers();
     }
@@ -183,6 +190,7 @@ public class GameService {
         Position startPosition = new Position(6f, 6f);
         Colors color=_games.get(gameID).getAvailableColor();
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
+        messagingTemplate.convertAndSend("/topic/"+gameID+"/occupiedColors", getOccupiedColors(gameID));
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
             messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
@@ -193,6 +201,7 @@ public class GameService {
         String gameId=generateGameId();
         GameMap map=new LobbyMap();
         _games.put(gameId, new Game(gameId, map, hostName));
+        messagingTemplate.convertAndSend("/topic/"+gameId+"/occupiedColors", getOccupiedColors(gameId));
         return gameId;
     }
 

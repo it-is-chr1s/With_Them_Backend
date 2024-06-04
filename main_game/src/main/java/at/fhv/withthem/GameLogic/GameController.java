@@ -105,7 +105,10 @@ public class GameController {
         }
         return new ResponseEntity<>(gameService.getSettings(gameId), HttpStatus.OK);
     }
-
+    @GetMapping("/occupiedColors/{gameId}")
+    public List<String> getOccupiedColors(@PathVariable String gameId) {
+        return gameService.getOccupiedColors(gameId);
+    }
 
     @Autowired
     public GameController(GameService gameService, SimpMessagingTemplate messagingTemplate) {
