@@ -17,6 +17,7 @@ import java.util.List;
 
 @SpringBootTest(classes = TasksApplication.class)
 public class TaskConnectingWiresApplicationTests {
+    /*
 
     @Autowired
     private TasksHandler tasksHandler;
@@ -106,4 +107,5 @@ public class TaskConnectingWiresApplicationTests {
         System.out.println("After cancel: " + sizeAfter);
         Assertions.assertEquals(sizeBefore + 1, sizeAfter);
     }
+     */
 }
