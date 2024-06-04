@@ -12,4 +12,5 @@ public class EmergencyMeetingApplication {
     public static void main(String[] args) {
         SpringApplication.run(EmergencyMeetingApplication.class, args);
     }
+    //start chat
 }
