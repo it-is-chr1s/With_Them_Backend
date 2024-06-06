@@ -2,7 +2,10 @@ package at.fhv.withthem.ChatLogic;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+
 @Component
 public class ChatHandler {
     private final HashMap<String, Chat> _chats= new HashMap<>();
@@ -22,5 +25,12 @@ public class ChatHandler {
         }
         else
             System.out.println("Chat does not exist");
+    }
+
+    public List<ChatMessage> getMessages(String gameId) {
+        if (_chats.containsKey(gameId)) {
+            return _chats.get(gameId).getMessages();
+        }
+        return Collections.emptyList(); // Or throw an exception if gameId doesn't exist
     }
 }
