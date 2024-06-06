@@ -12,13 +12,15 @@ public class ChatHandler {
     public void createChat(String gameId){
         if(chatExists(gameId))
             return;
-        System.out.println("Chat created");
+        System.out.println("Chat created"+gameId);
         _chats.put(gameId,new Chat(gameId));
     }
-    public void addMessage(String gameId, Message m){
+    public void addMessage(String gameId, ChatMessage m){
         if(chatExists(gameId)){
+            System.out.println("Message Added");
             _chats.get(gameId).addMessage(m);
         }
-        System.out.println("Chat does not exist");
+        else
+            System.out.println("Chat does not exist");
     }
 }

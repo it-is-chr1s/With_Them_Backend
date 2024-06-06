@@ -26,6 +26,14 @@ public class GameController {
         System.out.println("RequestBody in createGame:"+requestBody);
         String gameId = gameService.registerGame(requestBody);
         System.out.println("HOAST:"+gameService.getGame(gameId).getHost());
+
+        String url = "http://localhost:4003/chat/create";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(gameId, headers);
+        restTemplate.postForEntity(url, requestEntity, String.class);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
