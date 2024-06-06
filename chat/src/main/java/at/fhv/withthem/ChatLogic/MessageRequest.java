@@ -3,26 +3,15 @@ package at.fhv.withthem.ChatLogic;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class MessageRequest {
-    private boolean _alive;
     private String _gameId;
     private String _sander;
     private String _content;
     @JsonCreator
-    public MessageRequest(boolean alive, String gameId, String sander, String content){
-        _alive=alive;
+    public MessageRequest(String gameId, String sander, String content){
         _gameId=gameId;
         _sander=sander;
         _content=content;
     }
-
-    public boolean getAlive() {
-        return _alive;
-    }
-
-    public void setAlive(boolean _alive) {
-        this._alive = _alive;
-    }
-
     public String getGameId() {
         return _gameId;
     }

@@ -41,12 +41,8 @@ public class ChatController {
     @PostMapping("/chat/message")
     public void sandMessage(@RequestBody MessageRequest request){
         String gameId=request.getGameId();
-        if(request.getAlive()) {
             Message m = new Message(gameId, request.getSander(), request.getContent());
             _chatHandler.addMessage(gameId, m);
             _messagingTemplate.convertAndSend("/topic/chat/" + gameId + "/message", m);
-        }
-        else
-            System.out.println("Sander is dead");
     }
 }
