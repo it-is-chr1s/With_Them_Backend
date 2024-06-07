@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Controller
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:5173", "http://10.0.40.170:8080"})
 public class GameController {
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -38,7 +38,7 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = "*")
+    @CrossOrigin(origins = {"http://localhost:5173", "http://10.0.40.170:8080"})
     @GetMapping("/ableToJoin/{gameId}/{playerName}")
     public ResponseEntity<Boolean> getGame(@PathVariable String gameId, @PathVariable String playerName) {
 
@@ -69,7 +69,7 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = "*")
+    @CrossOrigin(origins = {"http://localhost:5173", "http://10.0.40.170:8080"})
     @PostMapping("/settings/{gameId}/{playerName}/{settings}/{value}")
     public ResponseEntity<String> setSettings(@PathVariable String gameId, @PathVariable String playerName, @PathVariable String settings, @PathVariable String value) {
         if (!gameService.getGame(gameId).getHost().equals(playerName)) {
