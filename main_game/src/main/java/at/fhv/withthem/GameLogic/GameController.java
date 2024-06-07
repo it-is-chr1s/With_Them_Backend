@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -247,5 +248,17 @@ public class GameController {
     public void handleMeetingEnd(@PathVariable String gameId) {
         System.out.println("Emergency meeting ended for game: " + gameId);
         gameService.resetDeathPositions(gameId);
+    }
+
+    @GetMapping("/requestGameState/{gameId}")
+    public ResponseEntity<Map<String, Object>> sendGameState(@PathVariable String gameId) {
+        Game game = gameService.getGame(gameId);
+        if (game != null) {
+            Map<String, Object> gameState = new HashMap<>();
+            gameState.put("isRunning", game.isRunning());
+            return new ResponseEntity<>(gameState, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Collections.singletonMap("error", "Game not found"), HttpStatus.NOT_FOUND);
+        }
     }
 }
