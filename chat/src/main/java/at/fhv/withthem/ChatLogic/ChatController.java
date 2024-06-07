@@ -10,7 +10,7 @@ import java.util.List;
 
 @Controller
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class ChatController {
     private final ChatHandler _chatHandler;
     private final SimpMessagingTemplate messagingTemplate;

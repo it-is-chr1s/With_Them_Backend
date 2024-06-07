@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Controller
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 public class EmergencyMeetingController {
 
     private final SimpMessagingTemplate _messagingTemplate;
