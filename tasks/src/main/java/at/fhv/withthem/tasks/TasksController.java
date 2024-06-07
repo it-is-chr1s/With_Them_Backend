@@ -118,5 +118,10 @@ public class TasksController {
         _messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), "");
     }
 
+    @MessageMapping("tasks/sabotage")
+    public void sabotage(){
+        System.out.println("sabotage");
+    }
+
 
 }
