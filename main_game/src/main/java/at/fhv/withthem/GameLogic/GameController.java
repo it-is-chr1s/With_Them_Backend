@@ -22,6 +22,7 @@ public class GameController {
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @RequestMapping(method= RequestMethod.POST, value="/createGame")
     public ResponseEntity<String> createGame(@RequestParam("hostName") String requestBody) {
         System.out.println("RequestBody in createGame:"+requestBody);
@@ -54,12 +55,14 @@ public class GameController {
         return new ResponseEntity<>(true   , HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @PostMapping("/TasksFinished/{gameId}")
     public ResponseEntity<String> tasksFinished(@PathVariable String gameId) {
         gameService.gameOver(gameId,0);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
@@ -106,6 +109,7 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/settings/{gameId}")
     public ResponseEntity<Settings> getSettings(@PathVariable("gameId") String gameId) {
         System.out.println(gameId);
@@ -114,6 +118,7 @@ public class GameController {
         }
         return new ResponseEntity<>(gameService.getSettings(gameId), HttpStatus.OK);
     }
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/occupiedColors/{gameId}")
     public List<String> getOccupiedColors(@PathVariable String gameId) {
         return gameService.getOccupiedColors(gameId);
@@ -125,6 +130,7 @@ public class GameController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @MessageMapping("/move")
     public void handleMove(MoveRequest moveRequest) {
         String gameId=moveRequest.getGameId();
@@ -138,6 +144,7 @@ public class GameController {
         gameService.updatePlayerDirection(gameId, playerName, direction);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @MessageMapping("/changeColor")
     public void handleColorChange(ChangeColorRequest colorRequest) {
         String gameId=colorRequest.getGameId();
@@ -146,6 +153,7 @@ public class GameController {
 
         gameService.updatePlayerColor(gameId, playerName, color);
     }
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @MessageMapping("/requestMap")
     public void sendMapLayout(MapRequest mapRequest) {
         String gameId = mapRequest.getGameId();
@@ -183,6 +191,7 @@ public class GameController {
         HttpEntity<List<InitTaskMessage>> requestEntity = new HttpEntity<>(initTaskMessages, headers);
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/game/{gameId}/players")
     @ResponseBody
     public PlayersRequest getPlayers(@PathVariable String gameId) {
@@ -195,6 +204,7 @@ public class GameController {
 
         return new PlayersRequest(alivePlayerInfo, deadPlayers.stream().map(Player::getId).collect(Collectors.toList()));
     }
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @MessageMapping("/kill")
     public void handleKill(KillRequest killRequest) {
         String gameId = killRequest.getGameId();
@@ -212,6 +222,7 @@ public class GameController {
             messagingTemplate.convertAndSend("/topic/" + gameId + "/killFailed", "Kill failed for player " + killerId);
         }*/
     }
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @PostMapping("/kickOut")
     public ResponseEntity<Void> kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
         String gameId = kickOutRequest.getGameId();
@@ -244,12 +255,14 @@ public class GameController {
         restTemplate.postForEntity(url, requestEntity, String.class);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/meetingEnded/{gameId}")
     public void handleMeetingEnd(@PathVariable String gameId) {
         System.out.println("Emergency meeting ended for game: " + gameId);
         gameService.resetDeathPositions(gameId);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/requestGameState/{gameId}")
     public ResponseEntity<Map<String, Object>> sendGameState(@PathVariable String gameId) {
         Game game = gameService.getGame(gameId);
