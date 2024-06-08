@@ -1,9 +1,15 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem.sabotages;
 
+import at.fhv.withthem.sabotages.sabotage.Sabotage;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 public class SabotageHandler {
+    private final HashMap<String, List<Sabotage>> _availableSabotages = new HashMap<>();
+    private Sabotage _currentSabotage;
 
     final int sabotageDuration_sec = 10;
     final int sabotageCooldown_sec = 30;

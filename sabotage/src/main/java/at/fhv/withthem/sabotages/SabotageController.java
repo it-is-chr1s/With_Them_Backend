@@ -1,4 +1,4 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem.sabotages;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -24,9 +24,9 @@ public class SabotageController {
     @MessageMapping("tasks/sabotage/start")
     public void sabotage(@Payload String lobbyID){
         _sabotageHandler.startSabotage(time -> {
-            _messagingTemplate.convertAndSend("/topic/tasks" + lobbyID + "/sabotage/timer", time);
+            _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/sabotage/timer", time);
         }, time -> {
-            _messagingTemplate.convertAndSend("/topic/tasks" + lobbyID + "/sabotage/cooldown", time);
+            _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/sabotage/cooldown", time);
         });
     }
 }

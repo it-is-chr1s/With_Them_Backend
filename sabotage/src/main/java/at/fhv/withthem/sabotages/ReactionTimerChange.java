@@ -1,4 +1,4 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem.sabotages;
 
 @FunctionalInterface
 public interface ReactionTimerChange {
