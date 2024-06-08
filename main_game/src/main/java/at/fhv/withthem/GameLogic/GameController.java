@@ -63,6 +63,7 @@ public class GameController {
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
         loadTasks(gameId, gameService.getTaskPositions(gameId));
+        loadSabotages(gameId, gameService.getSabotagePositions(gameId));
         loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
@@ -172,9 +173,30 @@ public class GameController {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        //messagingTemplate.convertAndSend("/tasks/loadAvailableTasks", initTaskMessages);
 
         String url = "http://localhost:4001/loadAvailableTasks";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<List<InitTaskMessage>> requestEntity = new HttpEntity<>(initTaskMessages, headers);
+        restTemplate.postForEntity(url, requestEntity, String.class);
+    }
+
+    public void loadSabotages(String lobbyID, List<TaskPosition> sabotagePositions) {
+        List<InitTaskMessage> initTaskMessages = new ArrayList<>();
+        for (TaskPosition sabotagePosition : sabotagePositions) {
+            initTaskMessages.add(new InitTaskMessage(lobbyID, sabotagePosition.getTaskType(), sabotagePosition.getId()));
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.print("Sabotages: ");
+            System.out.println(mapper.writeValueAsString(initTaskMessages));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        String url = "http://localhost:4004/sabotages/loadAvailableSabotages";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

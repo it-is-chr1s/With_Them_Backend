@@ -1,4 +1,4 @@
-package at.fhv.withthem.tasks.task;
+package at.fhv.withthem.tasks.task.connecting_wires;
 
 import at.fhv.withthem.tasks.TaskMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;

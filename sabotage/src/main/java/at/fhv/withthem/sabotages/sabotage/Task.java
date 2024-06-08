@@ -1,13 +1,13 @@
 package at.fhv.withthem.sabotages.sabotage;
 
-import at.fhv.withthem.sabotages.SabotageMessage;
+import at.fhv.withthem.sabotages.TaskMessage;
 
-public abstract class Sabotage {
+public abstract class Task {
     private String _player;
     private String _type;
     private int _id;
 
-    public Sabotage(String type, int id) {
+    public Task(String type, int id) {
         _type = type;
         _id = id;
     }
@@ -32,17 +32,17 @@ public abstract class Sabotage {
         return _player;
     }
 
-    public abstract void playerAction(SabotageMessage msg, Reaction reaction);
+    public abstract void playerAction(TaskMessage msg, Reaction reaction);
 
     public abstract void reset();
 
     public abstract boolean taskCompleted();
 
-    public abstract SabotageMessage getCurrentState();
+    public abstract TaskMessage getCurrentState();
 
     @Override
     public boolean equals(Object obj){
-        if(obj instanceof Sabotage task){
+        if(obj instanceof Task task){
             return task.getType().equals(_type);
         }else if(obj instanceof String type){
             return type.equals(_type);

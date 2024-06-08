@@ -1,7 +1,7 @@
 package at.fhv.withthem.tasks;
 
-import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
-import at.fhv.withthem.tasks.task.IncomingFileDownloadUploadMessage;
+import at.fhv.withthem.tasks.task.connecting_wires.IncomingConnectingWiresMessage;
+import at.fhv.withthem.tasks.task.file_download_upload.IncomingFileDownloadUploadMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -1,13 +1,17 @@
-package at.fhv.withthem.tasks.task;
+package at.fhv.withthem.tasks.task.file_download_upload;
 
 import at.fhv.withthem.tasks.TaskMessage;
+import at.fhv.withthem.tasks.task.Reaction;
+import at.fhv.withthem.tasks.task.Task;
+import at.fhv.withthem.tasks.task.file_download_upload.IncomingFileDownloadUploadMessage;
+import at.fhv.withthem.tasks.task.file_download_upload.OutgoingFileDownloadUploadMessage;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class TaskFileDownloadUpload extends Task{
+public class TaskFileDownloadUpload extends Task {
     private String _state;
     private float _progress;
     private boolean _running;

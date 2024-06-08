@@ -1,4 +1,7 @@
 package at.fhv.withthem.sabotages;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 /*
 import at.fhv.withthem.tasks.task.IncomingConnectingWiresMessage;
 import at.fhv.withthem.tasks.task.IncomingFileDownloadUploadMessage;
@@ -16,25 +19,25 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires"),
         @JsonSubTypes.Type(value = IncomingFileDownloadUploadMessage.class, name = "incomingFileDownloadUpload")
 })*/
-public class SabotageMessage {
+public class TaskMessage {
     private String _lobby;
     private String _task;
     private String _player;
     private int _id;
 
-    //@JsonCreator
-    public SabotageMessage(String lobby, String task, String player) {
+    @JsonCreator
+    public TaskMessage(String lobby, String task, String player) {
         _lobby = lobby;
         _task = task;
         _player = player;
     }
 
-    public SabotageMessage(String task, int id){
+    public TaskMessage(String task, int id){
         _task = task;
         _id = id;
     }
 
-    public SabotageMessage(String task) {
+    public TaskMessage(String task) {
         _task = task;
     }
 

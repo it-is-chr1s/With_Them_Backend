@@ -18,8 +18,8 @@ public abstract class GameMap {
 
 
 
-    public void setTask(int x, int y, String type, int id){
-        _grid[y][x] = type + "%id" + id;
+    public void setTask(int x, int y, String type, int id, boolean isSabotage){
+        _grid[y][x] = type + "%id=" + id + "%sabotage=" + isSabotage;
     }
 
     public boolean isTask(int x, int y){

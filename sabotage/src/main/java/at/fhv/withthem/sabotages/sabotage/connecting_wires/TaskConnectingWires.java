@@ -1,10 +1,14 @@
-package at.fhv.withthem.tasks.task;
+package at.fhv.withthem.sabotages.sabotage.connecting_wires;
 
-import at.fhv.withthem.tasks.TaskMessage;
+import at.fhv.withthem.sabotages.TaskMessage;
+import at.fhv.withthem.sabotages.sabotage.Reaction;
+import at.fhv.withthem.sabotages.sabotage.Task;
+import at.fhv.withthem.sabotages.sabotage.connecting_wires.IncomingConnectingWiresMessage;
+import at.fhv.withthem.sabotages.sabotage.connecting_wires.OutgoingConnectingWiresMessage;
 
 import java.util.Random;
 
-public class TaskConnectingWires extends Task{
+public class TaskConnectingWires extends Task {
     private final int _amountOfWires = 4;
     private final short[][] _plugs;
     private final boolean[] _connectedPlugs;
