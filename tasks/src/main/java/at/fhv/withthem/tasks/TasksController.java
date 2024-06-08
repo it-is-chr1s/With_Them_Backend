@@ -33,7 +33,10 @@ public class TasksController {
     @PostMapping("/loadAvailableTasks")
     public void loadLobby(@RequestBody List<InitTaskMessage> initTaskMessages) throws JsonProcessingException {
         System.out.println(initTaskMessages.get(0).getLobby() + " -> " + _tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby()));
-        if(!_tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby())) {
+        if(_tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby())){
+            _tasksHandler.removeLobby(initTaskMessages.get(0).getLobby());
+        }
+        //if(!_tasksHandler.lobbyExists(initTaskMessages.get(0).getLobby())) {
             ObjectMapper mapper = new ObjectMapper();
             for (InitTaskMessage initTaskMessage : initTaskMessages) {
                 _tasksHandler.addTaskToLobby(initTaskMessage.getLobby(), initTaskMessage.getType(), initTaskMessage.getId());
@@ -41,7 +44,7 @@ public class TasksController {
 
             System.out.println(mapper.writeValueAsString(_tasksHandler.getAvailableTasks(initTaskMessages.get(0).getLobby())));
             stateOfTasks(initTaskMessages.get(0).getLobby());
-        }
+        //}
     }
 
     @MessageMapping("tasks/requestStateOfTasks")
