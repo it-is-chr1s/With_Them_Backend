@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,34 +49,35 @@ public class GameService {
 
     @Scheduled(fixedRate = 1)
     public void gameLoop() {
-
         _games.forEach((gameId, game) -> {
             ConcurrentHashMap<String, Player> players = game.getPlayers();
-            players.forEach((playerId, player) -> {
-                    if (player.hasMoved()) {
-                        Position currentPosition = player.getPosition();
-                        Direction direction = player.getDirection();
-                        float speed = 0.01f;
+                players.forEach((playerId, player) -> {
+                        if (player.hasMoved()) {
+                            Position currentPosition = player.getPosition();
+                            Direction direction = player.getDirection();
+                            float speed = 0.01f;
 
-                        Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+                            Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-                        if ((player.isAlive() && canMoveTo(gameId, newPosition)) || !player.isAlive() && canGhostMoveTo(gameId, newPosition)) {
-                            player.setPosition(newPosition);
-                            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
-                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
-                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
-                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
+                            if ((player.isAlive() && canMoveTo(gameId, newPosition)) || !player.isAlive() && canGhostMoveTo(gameId, newPosition)) {
+                                player.setPosition(newPosition);
+                                messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
+                                messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                                messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
+                                messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
+                            }
                         }
+                    if(!game.getPlayer(playerId).checkHeartBeat()){
+                        messagingTemplate.convertAndSend("/topic/"+gameId+"/remove", playerId);
+                        game.removePlayer(playerId);
                     }
-                if(!_games.get(gameId).getPlayer(playerId).checkHeartBeat()){
-                    messagingTemplate.convertAndSend("/topic/"+gameId+"/remove", playerId);
-                    _games.get(gameId).removePlayer(playerId);
-                }
 
-            });
+                });
             if(game.isRunning()) {
-                gameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
+                gameOver(gameId);
             }
+            if(game.isGameEmpty())
+                _games.remove(gameId);
         });
     }
     public void gameWon(String gameId){

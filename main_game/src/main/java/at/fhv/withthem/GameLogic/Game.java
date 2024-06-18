@@ -4,6 +4,7 @@ import at.fhv.withthem.GameLogic.Maps.GameMap;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Game {
@@ -22,7 +23,7 @@ public class Game {
         _gameId=gameId;
         this._map =map;
         _host=new Player(host,new Position(6f,6f),Colors.BLUE);
-        _players.put(host, _host);
+        _players.put(host, new Player(host,new Position(6f,6f),Colors.BLUE));
         _settings=new Settings();
         _isRunning=false;
     }
@@ -98,6 +99,14 @@ public class Game {
     }
     public void removePlayer(String name){
         _players.remove(name);
+        if(_host.getName().equals(name)&&!_players.isEmpty()){
+            _host = _players.values().iterator().next();
+        }
         System.out.println("Player "+name+" was removed from the game, no heart beats");
+    }
+    public boolean isGameEmpty(){
+        if(_players.isEmpty())
+            return true;
+        return false;
     }
 }
