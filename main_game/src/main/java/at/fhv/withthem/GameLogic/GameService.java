@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -51,28 +52,30 @@ public class GameService {
         _games.forEach((gameId, game) -> {
             ConcurrentHashMap<String, Player> players = game.getPlayers();
             players.forEach((playerId, player) -> {
-                if (player.hasMoved()) {
-                    Position currentPosition = player.getPosition();
-                    Direction direction = player.getDirection();
-                    float speed = 0.01f;
+                    if (player.hasMoved()) {
+                        Position currentPosition = player.getPosition();
+                        Direction direction = player.getDirection();
+                        float speed = 0.01f;
 
-                    Position newPosition = calculateNewPosition(currentPosition, direction, speed);
+                        Position newPosition = calculateNewPosition(currentPosition, direction, speed);
 
-                    if ((player.isAlive() && canMoveTo(gameId, newPosition)) || !player.isAlive() && canGhostMoveTo(gameId, newPosition)) {
-                        player.setPosition(newPosition);
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
-                        messagingTemplate.convertAndSend("/topic/" +gameId+"/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
+                        if ((player.isAlive() && canMoveTo(gameId, newPosition)) || !player.isAlive() && canGhostMoveTo(gameId, newPosition)) {
+                            player.setPosition(newPosition);
+                            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(playerId, newPosition, player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
+                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/task", canDoTask(gameId, player.getPosition()));
+                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeeting", canCallEmergencyMeeting(gameId, player.getPosition()));
+                            messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
+                        }
                     }
-                }
+                if(!_games.get(gameId).getPlayer(playerId).checkHeartBeat())
+                    _games.get(gameId).removePlayer(playerId);
+
             });
             if(game.isRunning()) {
                 gameOver(gameId); //TODO: move to Kill and if player is voted in emergency meeting, game over
             }
         });
     }
-
     public void gameWon(String gameId){
         _games.get(gameId).setWon(true);
     }
@@ -168,7 +171,6 @@ public class GameService {
     private boolean canCallEmergencyMeetingReport(String gameId, Position position) {
         Boolean corpe= getPlayers(gameId).values().stream()
                 .anyMatch(player -> ((int)position.getX()==(int)player.getDeathPosition().getX()&&(int)position.getY()==(int)player.getDeathPosition().getY()));
-        System.out.println(corpe);
         return corpe;
     }
 
@@ -381,5 +383,8 @@ public class GameService {
 
     public void setMaxPlayers(String gameId, int i) {
         _games.get(gameId).getSettings().setMaxPlayers(i);
+    }
+    public void setHeartBeat(String gameId, String name){
+        _games.get(gameId).getPlayer(name).setLastHeartBeat(LocalDateTime.now());
     }
 }

@@ -27,6 +27,9 @@ public class Game {
         _isRunning=false;
     }
 
+    public Player getPlayer(String name){
+        return _players.get(name);
+    }
     public boolean isWon() {
         return _isWon;
     }
@@ -92,5 +95,9 @@ public class Game {
                return false;
         }
         return  true;
+    }
+    public void removePlayer(String name){
+        _players.remove(name);
+        System.out.println("Player "+name+" was removed from the game, no heart beats");
     }
 }

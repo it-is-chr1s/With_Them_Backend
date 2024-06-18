@@ -1,5 +1,7 @@
 package at.fhv.withthem.GameLogic;
 
+import java.time.LocalDateTime;
+
 public class Player {
 
     private String _id;
@@ -15,6 +17,7 @@ public class Player {
     private boolean _hasMoved = false;
 
     private long _lastKillTime = 0L;
+    private LocalDateTime _lastHeartbeat;
     public Player(String id, Position position, Colors color) {
         this._id = id;
         this._name=id;
@@ -24,6 +27,20 @@ public class Player {
         this._deathPosition = new Position(-1, -1);
     }
 
+    public boolean checkHeartBeat() {
+        if(_lastHeartbeat==null){
+            _lastHeartbeat=LocalDateTime.now();
+            return true;
+        }
+        if (_lastHeartbeat.isBefore(LocalDateTime.now().minusSeconds(20))) {
+            System.out.println("User " + _name + " is inactive.");
+            return false;
+        }
+        return true;
+    }
+    public void setLastHeartBeat(LocalDateTime dt){
+        _lastHeartbeat=dt;
+    }
     public boolean canKillAgain() {
         return System.currentTimeMillis() - _lastKillTime > 20_000;
     }

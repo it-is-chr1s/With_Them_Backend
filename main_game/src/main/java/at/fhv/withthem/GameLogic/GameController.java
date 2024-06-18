@@ -8,10 +8,12 @@ import org.springframework.http.*;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -274,4 +276,12 @@ public class GameController {
             return new ResponseEntity<>(Collections.singletonMap("error", "Game not found"), HttpStatus.NOT_FOUND);
         }
     }
+
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
+    @PostMapping("/heartbeat/{gameId}/{name}")
+    public ResponseEntity<Void>  receiveHeartbeat(@PathVariable String gameId,@PathVariable String name) {
+        gameService.setHeartBeat(gameId,name);
+        return ResponseEntity.ok().build(); // Return a 200 OK response with no body
+    }
+
 }
