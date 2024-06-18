@@ -69,7 +69,6 @@ public class GameController {
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
         loadTasks(gameId, gameService.getTaskPositions(gameId));
-        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
@@ -215,8 +214,6 @@ public class GameController {
         System.out.println("kill request. KillerID: " + killerId + "    game id: " + gameId);
 
         boolean success = gameService.killPlayer(gameId, killerId);
-        if(success)
-            loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
 
        /* if (success) {
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kill", "Player " + killerId + " made a kill");
@@ -228,8 +225,10 @@ public class GameController {
     @PostMapping("/kickOut")
     public ResponseEntity<Void> kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
         String gameId = kickOutRequest.getGameId();
-        gameService.kickOutPlayer(gameId, kickOutRequest.getKillerId());
-        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+        String suspect=kickOutRequest.getKillerId();
+        if(!suspect.equals("NO ONE WAS KICKED"))
+            gameService.kickOutPlayer(gameId,suspect);
+        gameService.spawnPlayers(gameId);
         return ResponseEntity.ok().build(); // Return a 200 OK response with no body
     }
     public void loadEmergencyMeeting(String gameId, ConcurrentHashMap<String, Player> players){

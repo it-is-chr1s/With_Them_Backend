@@ -296,7 +296,6 @@ public class GameService {
         int kickedOutPlayerRoll= kickedOut.getRole();
         System.out.println("Roll of kicked player was:"+ kickedOutPlayerRoll);
         if(kickedOutPlayerRoll==1) {
-            System.out.println("/topic/" + gameId + "/kickedOutRoll");
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Imposter");
         }        else
             messagingTemplate.convertAndSend("/topic/" + gameId + "/kickedOutRoll", "Crew Mate");
@@ -343,7 +342,7 @@ public class GameService {
         getGame(gameId).setRunning(true);
     }
 
-    private void spawnPlayers(String gameId){
+    public void spawnPlayers(String gameId){
         final double distance = 1.5;
         final double centerX = 44.5;
         final double centerY = 11.5;

@@ -93,8 +93,7 @@ public class EmergencyMeetingController {
     public String getSuspect(@PathVariable String gameId) {
         String suspect=_emergencyMeetingHandler.getSuspect(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
-        if(!suspect.equals("NO ONE WAS KICKED"))
-            kickOut(gameId,suspect);
+        kickOut(gameId,suspect);
         return suspect;
     }
 
