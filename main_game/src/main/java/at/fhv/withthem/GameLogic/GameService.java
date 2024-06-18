@@ -67,8 +67,10 @@ public class GameService {
                             messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/controlsEnabled/emergencyMeetingReport", canCallEmergencyMeetingReport(gameId, player.getPosition()));
                         }
                     }
-                if(!_games.get(gameId).getPlayer(playerId).checkHeartBeat())
+                if(!_games.get(gameId).getPlayer(playerId).checkHeartBeat()){
+                    messagingTemplate.convertAndSend("/topic/"+gameId+"/remove", playerId);
                     _games.get(gameId).removePlayer(playerId);
+                }
 
             });
             if(game.isRunning()) {
