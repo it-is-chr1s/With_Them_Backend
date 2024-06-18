@@ -54,7 +54,7 @@ public class EmergencyMeetingHandler {
                     System.out.println("Voting ended");
                     _emergencyMeetings.get(gameId).endVoting();
                 }
-            }, 60, TimeUnit.SECONDS);
+            }, 45, TimeUnit.SECONDS);
         }
     }
     public String vote(String gameId, String voter, String nominated){
