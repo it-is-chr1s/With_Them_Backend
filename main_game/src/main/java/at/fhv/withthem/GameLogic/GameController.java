@@ -229,7 +229,6 @@ public class GameController {
     public ResponseEntity<Void> kickOut(@RequestBody KillRequest kickOutRequest) throws JsonProcessingException {
         String gameId = kickOutRequest.getGameId();
         gameService.kickOutPlayer(gameId, kickOutRequest.getKillerId());
-        loadEmergencyMeeting(gameId, gameService.getPlayers(gameId));
         loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         return ResponseEntity.ok().build(); // Return a 200 OK response with no body
     }
@@ -276,7 +275,12 @@ public class GameController {
             return new ResponseEntity<>(Collections.singletonMap("error", "Game not found"), HttpStatus.NOT_FOUND);
         }
     }
-
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
+    @PostMapping("/loadMeeting/{gameId}")
+    public ResponseEntity<Void>  loadMeeting(@PathVariable String gameId) {
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
+        return ResponseEntity.ok().build(); // Return a 200 OK response with no body
+    }
     @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @PostMapping("/heartbeat/{gameId}/{name}")
     public ResponseEntity<Void>  receiveHeartbeat(@PathVariable String gameId,@PathVariable String name) {
