@@ -389,6 +389,8 @@ public class GameService {
         _games.get(gameId).getSettings().setMaxPlayers(i);
     }
     public void setHeartBeat(String gameId, String name){
-        _games.get(gameId).getPlayer(name).setLastHeartBeat(LocalDateTime.now());
+        Player p=_games.get(gameId).getPlayer(name);
+        if(p!=null)
+            p.setLastHeartBeat(LocalDateTime.now());
     }
 }
