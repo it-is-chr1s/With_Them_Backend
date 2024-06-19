@@ -86,12 +86,13 @@ public class GameController {
                 }catch (NumberFormatException e) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
-                if(Integer.parseInt(value)<0) {
+                if(Integer.parseInt(value)<1) {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 gameService.setMaxPlayers(gameId, Integer.parseInt(value));
+                System.out.println(gameService.getSettings(gameId).getMaxPlayers());
                 break;
-            case "Imposters":
+            case "imposters":
                 try {
                     Integer.parseInt(value);
                 }
@@ -105,6 +106,8 @@ public class GameController {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
                 gameService.setImposters(gameId, Integer.parseInt(value));
+                System.out.println(gameService.getSettings(gameId).getRoles().get(1));
+
                 break;
          }
         return new ResponseEntity<>(gameId, HttpStatus.OK);
