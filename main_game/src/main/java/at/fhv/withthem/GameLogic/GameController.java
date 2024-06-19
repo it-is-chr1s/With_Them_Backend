@@ -115,12 +115,12 @@ public class GameController {
 
     @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/settings/{gameId}")
-    public ResponseEntity<Settings> getSettings(@PathVariable("gameId") String gameId) {
+    public ResponseEntity<String> getSettings(@PathVariable("gameId") String gameId) {
         System.out.println(gameId);
         if(gameId==null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(gameService.getSettings(gameId), HttpStatus.OK);
+        return new ResponseEntity<>(gameService.getSettings(gameId).toString(), HttpStatus.OK);
     }
     @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/occupiedColors/{gameId}")
