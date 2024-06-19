@@ -70,6 +70,7 @@ public class GameController {
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
         gameService.startGame(gameId);
         loadTasks(gameId, gameService.getTaskPositions(gameId));
+        loadEmergencyMeeting(gameId,gameService.getPlayers(gameId));
         sendMapLayout(new MapRequest(gameId));
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
