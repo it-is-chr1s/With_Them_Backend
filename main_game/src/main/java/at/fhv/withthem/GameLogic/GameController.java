@@ -54,6 +54,7 @@ public class GameController {
         if (gameService.getGame(gameId).getPlayers().containsKey(playerName)) {
             return new ResponseEntity<>(false,HttpStatus.OK);
         }
+        gameService.registerPlayer(gameId,playerName);
         return new ResponseEntity<>(true   , HttpStatus.OK);
     }
 
@@ -141,9 +142,9 @@ public class GameController {
         String playerName = moveRequest.getName();
         Direction direction = moveRequest.getDirection();
 
-        if (!gameService.playerExists(gameId, playerName)) {
+        /*if (!gameService.playerExists(gameId, playerName)) {
             gameService.registerPlayer(gameId, playerName);
-        }
+        }*/
 
         gameService.updatePlayerDirection(gameId, playerName, direction);
     }

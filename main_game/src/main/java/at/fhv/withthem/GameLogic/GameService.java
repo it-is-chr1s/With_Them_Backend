@@ -70,6 +70,7 @@ public class GameService {
                     if(!game.getPlayer(playerId).checkHeartBeat()){
                         messagingTemplate.convertAndSend("/topic/"+gameId+"/remove", playerId);
                         game.removePlayer(playerId);
+                        messagingTemplate.convertAndSend("/topic/" + gameId + "/player/" + playerId + "/removed", LocalDateTime.now());
                     }
 
                 });
