@@ -44,6 +44,13 @@ public class TasksHandler {
         return _initializedLobbies.contains(lobbyId);
     }
 
+    public void removeLobby(String lobby){
+        _availableTasks.remove(lobby);
+        _activeTasks.remove(lobby);
+        _finishedTasks.remove(lobby);
+        _initializedLobbies.remove(lobby);
+    }
+
     public void startTask(String lobby, int taskId, String player){
         Iterator<Task> iterator = _availableTasks.get(lobby).iterator();
         while (iterator.hasNext()) {

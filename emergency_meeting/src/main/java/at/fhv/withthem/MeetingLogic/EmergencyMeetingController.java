@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Controller
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
 public class EmergencyMeetingController {
 
     private final SimpMessagingTemplate _messagingTemplate;
@@ -93,8 +93,7 @@ public class EmergencyMeetingController {
     public String getSuspect(@PathVariable String gameId) {
         String suspect=_emergencyMeetingHandler.getSuspect(gameId);
         _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
-        if(!suspect.equals("NO ONE WAS KICKED"))
-            kickOut(gameId,suspect);
+        kickOut(gameId,suspect);
         return suspect;
     }
 
