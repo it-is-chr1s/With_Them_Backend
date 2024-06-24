@@ -350,12 +350,19 @@ public class GameService {
         final int n = getGame(gameId).getPlayers().values().size();
         final double radius = distance / (2 * Math.sin(Math.PI / n));
         int i = 0;
+
+        ArrayList<String> imposters = new ArrayList<>();
+        for(Player player : getGame(gameId).getPlayers().values()){
+            if(player.getRole() == 1){
+                imposters.add(player.getId());
+            }
+        }
         for(Player player : getGame(gameId).getPlayers().values()) {
             double angle = (2 * Math.PI * i++ / n) - Math.PI / 2;
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
             player.setPosition(new Position((float) x, (float) y));
-            messagingTemplate.convertAndSend("/topic/" + gameId + "/" + player.getId()+ "/onStart", player.getRole());
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/" + player.getId()+ "/onStart", imposters);
             messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         }
     }
