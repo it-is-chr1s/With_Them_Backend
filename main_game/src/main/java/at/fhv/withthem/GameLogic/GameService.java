@@ -336,8 +336,8 @@ public class GameService {
             }
         }
 
+        setImposters(gameId);
         spawnPlayers(gameId);
-
         System.out.println("Game started!");
         getGame(gameId).setGameMap(new PolusMap());
         getGame(gameId).setRunning(true);
@@ -351,6 +351,15 @@ public class GameService {
         final double radius = distance / (2 * Math.sin(Math.PI / n));
         int i = 0;
 
+        for(Player player : getGame(gameId).getPlayers().values()) {
+            double angle = (2 * Math.PI * i++ / n) - Math.PI / 2;
+            double x = centerX + radius * Math.cos(angle);
+            double y = centerY + radius * Math.sin(angle);
+            player.setPosition(new Position((float) x, (float) y));
+            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
+        }
+    }
+    public void setImposters(String gameId){
         ArrayList<String> imposters = new ArrayList<>();
         for(Player player : getGame(gameId).getPlayers().values()){
             if(player.getRole() == 1){
@@ -358,14 +367,9 @@ public class GameService {
             }
         }
         for(Player player : getGame(gameId).getPlayers().values()) {
-            double angle = (2 * Math.PI * i++ / n) - Math.PI / 2;
-            double x = centerX + radius * Math.cos(angle);
-            double y = centerY + radius * Math.sin(angle);
-            player.setPosition(new Position((float) x, (float) y));
             messagingTemplate.convertAndSend("/topic/" + gameId + "/" + player.getId()+ "/onStart", imposters);
-            messagingTemplate.convertAndSend("/topic/" + gameId + "/position", new PlayerPosition(player.getId(), player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         }
-    }
+        }
 
     public void resetDeathPositions(String gameId) {
         Game game = _games.get(gameId);
