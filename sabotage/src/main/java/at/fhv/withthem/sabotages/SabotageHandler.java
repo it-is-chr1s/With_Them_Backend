@@ -3,7 +3,12 @@ package at.fhv.withthem.sabotages;
 import at.fhv.withthem.sabotages.sabotage.Reaction;
 import at.fhv.withthem.sabotages.sabotage.Task;
 import at.fhv.withthem.sabotages.sabotage.connecting_wires.TaskConnectingWires;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -16,8 +21,8 @@ public class SabotageHandler {
     final private int SABOTAGE_DURATION_SEC = 60;
     final private int SABOTAGE_COOLDOWN_SEC = 90;
 
-    private HashMap<String, Integer> timerDuration_sec = new HashMap<>();
-    private HashMap<String, Integer> timerCooldown_sec = new HashMap<>();
+    private HashMap<String, Integer> _timerDuration_sec = new HashMap<>();
+    private HashMap<String, Integer> _timerCooldown_sec = new HashMap<>();
 
     public SabotageHandler(){
         if(SABOTAGE_DURATION_SEC > SABOTAGE_COOLDOWN_SEC){
@@ -29,8 +34,8 @@ public class SabotageHandler {
         if(_availableSabotages.get(lobby) == null) {
             _availableSabotages.put(lobby, new ArrayList<>());
 
-            timerDuration_sec.put(lobby, SABOTAGE_DURATION_SEC);
-            timerCooldown_sec.put(lobby, SABOTAGE_COOLDOWN_SEC);
+            _timerDuration_sec.put(lobby, SABOTAGE_DURATION_SEC);
+            _timerCooldown_sec.put(lobby, SABOTAGE_COOLDOWN_SEC);
 
             _initializedLobbies.add(lobby);
         }
@@ -43,8 +48,8 @@ public class SabotageHandler {
         }
     }
 
-    public void startSabotage(String lobbyID, int sabotageId, Reaction reaction) {
-        if(timerDuration_sec.get(lobbyID) == SABOTAGE_DURATION_SEC && timerCooldown_sec.get(lobbyID) == SABOTAGE_COOLDOWN_SEC) {
+    public void startSabotage(String lobbyID, int sabotageId, Reaction updateInformation, Reaction reachedTimeout) {
+        if(_timerDuration_sec.get(lobbyID) == SABOTAGE_DURATION_SEC && _timerCooldown_sec.get(lobbyID) == SABOTAGE_COOLDOWN_SEC) {
             for(Task task : _availableSabotages.get(lobbyID)){
                 if(task.getId() == sabotageId){
                     _currentSabotage.put(lobbyID, task);
@@ -53,7 +58,7 @@ public class SabotageHandler {
             }
 
             Thread timerThread = new Thread(() -> {
-                while (timerCooldown_sec.get(lobbyID) > 0) {
+                while (_timerCooldown_sec.get(lobbyID) > 0) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -61,23 +66,33 @@ public class SabotageHandler {
                         break;  // Exit the loop if the thread is interrupted
                     }
 
-                    timerCooldown_sec.replace(lobbyID, timerCooldown_sec.get(lobbyID) - 1);
-                    if (timerDuration_sec.get(lobbyID) > 0) {
-                        timerDuration_sec.replace(lobbyID, timerDuration_sec.get(lobbyID) - 1);
+                    _timerCooldown_sec.replace(lobbyID, _timerCooldown_sec.get(lobbyID) - 1);
+                    if (_timerDuration_sec.get(lobbyID) > 0) {
+                        _timerDuration_sec.replace(lobbyID, _timerDuration_sec.get(lobbyID) - 1);
                     }
 
-                    reaction.react();
+                    updateInformation.react();
 
-                    System.out.println("Sabotage timer: " + timerDuration_sec.get(lobbyID) + "s");
-                    System.out.println("Sabotage cooldown: " + timerCooldown_sec.get(lobbyID) + "s");
+                    System.out.println("Sabotage timer: " + _timerDuration_sec.get(lobbyID) + "s");
+                    System.out.println("Sabotage cooldown: " + _timerCooldown_sec.get(lobbyID) + "s");
+
+                    if(_timerDuration_sec.get(lobbyID) == 0 && _currentSabotage.get(lobbyID) != null){
+                        cleanLobby(lobbyID);
+                        reachedTimeout.react();
+                    }
                 }
-                System.out.println("Sabotage completed.");
-
-                timerDuration_sec.replace(lobbyID, SABOTAGE_DURATION_SEC);
-                timerCooldown_sec.replace(lobbyID, SABOTAGE_COOLDOWN_SEC);
+                System.out.println("Sabotage cooldown reached.");
             });
             timerThread.start();
         }
+    }
+
+    private void cleanLobby(String lobbyID){
+        _availableSabotages.remove(lobbyID);
+        _currentSabotage.remove(lobbyID);
+        _timerDuration_sec.remove(lobbyID);
+        _timerCooldown_sec.remove(lobbyID);
+        _initializedLobbies.remove(lobbyID);
     }
 
     public List<TaskMessage> getAvailableSabotages(String lobby){
@@ -99,10 +114,10 @@ public class SabotageHandler {
     }
 
     public int getTimerDuration_sec(String lobbyID){
-        return timerDuration_sec.get(lobbyID);
+        return _timerDuration_sec.get(lobbyID);
     }
 
     public int getTimerCooldown_sec(String lobbyID){
-        return timerCooldown_sec.get(lobbyID);
+        return _timerCooldown_sec.get(lobbyID);
     }
 }

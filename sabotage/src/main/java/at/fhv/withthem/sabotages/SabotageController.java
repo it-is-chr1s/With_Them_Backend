@@ -5,6 +5,10 @@ import ch.qos.logback.core.joran.sanity.Pair;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,6 +87,17 @@ public class SabotageController {
     public void sabotage(@RequestBody StartSabotageMessage startSabotageMessage) {
         _sabotageHandler.startSabotage(startSabotageMessage.getGameId(),
                 startSabotageMessage.getSabotageId(),
-                () -> sabotageInformation(startSabotageMessage.getGameId()));
+                () -> sabotageInformation(startSabotageMessage.getGameId()),
+                () -> {
+                    System.out.println("Reached timeout for " + startSabotageMessage.getGameId());
+                    RestTemplate restTemplate = new RestTemplate();
+                    String url = "http://localhost:4000/sabotageReachedTimeout/" + startSabotageMessage.getGameId();
+
+                    // Make POST request to the endpoint
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    HttpEntity<String> request = new HttpEntity<>(startSabotageMessage.getGameId(), headers);
+                    ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+                });
     }
 }

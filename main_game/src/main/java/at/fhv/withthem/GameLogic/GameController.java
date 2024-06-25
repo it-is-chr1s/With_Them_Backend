@@ -67,6 +67,13 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
+    @PostMapping("/sabotageReachedTimeout/{gameId}")
+    public ResponseEntity<String> sabotageReachedTimeout(@PathVariable String gameId){
+        gameService.gameOver(gameId, 1);
+        return new ResponseEntity<>(gameId, HttpStatus.OK);
+    }
+
     @CrossOrigin(origins = { "http://localhost:5173/", "http://10.0.40.170:8080/" })
     @PostMapping("/startGame")
     public ResponseEntity<String> startGame(@RequestBody String gameId) {
