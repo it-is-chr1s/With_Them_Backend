@@ -13,8 +13,8 @@ public class SabotageHandler {
     private HashMap<String, Task> _currentSabotage = new HashMap<>();
     private final Set<String> _initializedLobbies = new HashSet<>();
 
-    final private int SABOTAGE_DURATION_SEC = 10;
-    final private int SABOTAGE_COOLDOWN_SEC = 30;
+    final private int SABOTAGE_DURATION_SEC = 60;
+    final private int SABOTAGE_COOLDOWN_SEC = 90;
 
     private HashMap<String, Integer> timerDuration_sec = new HashMap<>();
     private HashMap<String, Integer> timerCooldown_sec = new HashMap<>();
@@ -43,8 +43,15 @@ public class SabotageHandler {
         }
     }
 
-    public void startSabotage(String lobbyID, Reaction reaction) {
+    public void startSabotage(String lobbyID, int sabotageId, Reaction reaction) {
         if(timerDuration_sec.get(lobbyID) == SABOTAGE_DURATION_SEC && timerCooldown_sec.get(lobbyID) == SABOTAGE_COOLDOWN_SEC) {
+            for(Task task : _availableSabotages.get(lobbyID)){
+                if(task.getId() == sabotageId){
+                    _currentSabotage.put(lobbyID, task);
+                    break;
+                }
+            }
+
             Thread timerThread = new Thread(() -> {
                 while (timerCooldown_sec.get(lobbyID) > 0) {
                     try {

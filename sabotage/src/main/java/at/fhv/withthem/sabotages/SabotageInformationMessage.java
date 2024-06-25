@@ -1,5 +1,7 @@
 package at.fhv.withthem.sabotages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -9,6 +11,7 @@ public class SabotageInformationMessage {
     private int timer;
     private int cooldown;
 
+    @JsonCreator
     public SabotageInformationMessage(List<HashMap<Integer, String>> availableSabotages, int currentSabotageID, int timer, int cooldown) {
         _availableSabotages = availableSabotages;
         _currentSabotageID = currentSabotageID;

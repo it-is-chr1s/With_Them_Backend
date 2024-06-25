@@ -104,7 +104,7 @@ public class PolusMap extends GameMap{
                 setTask(78, 19, "File Download", 9, false); // Navigation
                 setTask(80, 19, "File Upload", 9, false); // Navigation
                 setTask(81, 21, "Connecting Wires", 10, false); // Navigation
-                setTask(57, 19, "Connecting Wires", 11, false); // o2
+                setTask(57, 19, "Connecting Wires", 11, true); // o2
                 setTask(1, 24, "Connecting Wires", 12, false); // o2
                 // Security, Shields, Storage, Weapons are not implemented
         }

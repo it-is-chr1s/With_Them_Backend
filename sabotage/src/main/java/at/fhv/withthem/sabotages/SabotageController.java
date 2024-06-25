@@ -75,11 +75,13 @@ public class SabotageController {
             throw new RuntimeException(e);
         }
 
-        _messagingTemplate.convertAndSend("/topic/tasks/" + lobbyID + "/information", message);
+        _messagingTemplate.convertAndSend("/topic/sabotages/" + lobbyID + "/information", message);
     }
 
     @MessageMapping("sabotages/startSabotage")
-    public void sabotage(@Payload String lobbyID){
-        _sabotageHandler.startSabotage(lobbyID, () -> sabotageInformation(lobbyID));
+    public void sabotage(@RequestBody StartSabotageMessage startSabotageMessage) {
+        _sabotageHandler.startSabotage(startSabotageMessage.getGameId(),
+                startSabotageMessage.getSabotageId(),
+                () -> sabotageInformation(startSabotageMessage.getGameId()));
     }
 }
