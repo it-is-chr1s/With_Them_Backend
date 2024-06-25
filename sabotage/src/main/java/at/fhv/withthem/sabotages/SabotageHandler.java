@@ -11,7 +11,7 @@ import java.util.*;
 public class SabotageHandler {
     private final HashMap<String, List<Task>> _availableSabotages = new HashMap<>();
     private HashMap<String, Task> _currentSabotage = new HashMap<>();
-    private String _status = "unset";
+    private HashMap<String, String> _status = new HashMap<>();
     private final Set<String> _initializedLobbies = new HashSet<>();
 
     final private int SABOTAGE_DURATION_SEC = 60;
@@ -33,6 +33,8 @@ public class SabotageHandler {
             _timerDuration_sec.put(lobby, SABOTAGE_DURATION_SEC);
             _timerCooldown_sec.put(lobby, SABOTAGE_COOLDOWN_SEC);
 
+            _status.put(lobby, "unset");
+
             _initializedLobbies.add(lobby);
         }
 
@@ -52,9 +54,9 @@ public class SabotageHandler {
                     break;
                 }
             }
-            _status = "available";
+            _status.replace(lobbyID, "available");
             Thread timerThread = new Thread(() -> {
-                while (_timerCooldown_sec.get(lobbyID) > 0) {
+                while (_timerCooldown_sec.get(lobbyID) != null && _timerCooldown_sec.get(lobbyID) > 0) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -91,6 +93,38 @@ public class SabotageHandler {
         _initializedLobbies.remove(lobbyID);
     }
 
+    public void startFixingSabotage(String lobbyID, int sabotageId, String player){
+        if(sabotageId == _currentSabotage.get(lobbyID).getId()){
+            _currentSabotage.get(lobbyID).setPlayer(player);
+            _status.replace(lobbyID, "active");
+        }
+    }
+
+    public TaskMessage getCurrentState(String lobby, String player){
+        if(_currentSabotage.get(lobby).getPlayer().equals(player)){
+            TaskMessage taskMessage = _currentSabotage.get(lobby).getCurrentState();
+            taskMessage.setLobby(lobby);
+            taskMessage.setPlayer(player);
+            taskMessage.setId(_currentSabotage.get(lobby).getId());
+            return taskMessage;
+        }
+
+        return null;
+    }
+
+    public boolean taskCompleted(String lobby, int id){
+        if(_currentSabotage.get(lobby).getId() == id && _currentSabotage.get(lobby).taskCompleted()){
+            System.out.println("Sabotage fixed: " + id);
+            return true;
+        }
+        System.out.println("Sabotage not fixed: " + id);
+        return false;
+    }
+
+    public void cancelTask(String lobby, int id){
+        _status.replace(lobby, "available");
+    }
+
     public List<TaskMessage> getAvailableSabotages(String lobby){
         List<TaskMessage> availableSabotages = new ArrayList<>();
 
@@ -118,6 +152,6 @@ public class SabotageHandler {
     }
 
     public String getStatus(String lobbyID){
-        return _status;
+        return _status.get(lobbyID);
     }
 }

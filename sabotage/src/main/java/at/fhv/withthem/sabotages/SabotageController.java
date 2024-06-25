@@ -102,16 +102,34 @@ public class SabotageController {
                 });
     }
 
-    @MessageMapping("sabotage/startTask")
-    public void startTask(TaskMessage taskMessage){
+    @MessageMapping("sabotages/startFixing")
+    public void startFixingSabotage(TaskMessage taskMessage){
         ObjectMapper mapper = new ObjectMapper();
         try {
-            System.out.println("Task started: " + mapper.writeValueAsString(taskMessage));
+            System.out.println("Fixing started: " + mapper.writeValueAsString(taskMessage));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        //_tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getId(), taskMessage.getPlayer());
-        //stateOfTasks(taskMessage.getLobby());
-        //_messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+        _sabotageHandler.startFixingSabotage(taskMessage.getLobby(), taskMessage.getId(), taskMessage.getPlayer());
+        sabotageInformation(taskMessage.getLobby());
+        _messagingTemplate.convertAndSend("/topic/sabotages/" + taskMessage.getLobby() + "/currentSabotage/" + taskMessage.getPlayer(), _sabotageHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+    }
+
+    @MessageMapping("sabotages/closeSabotage")
+    public void cancelTask(TaskMessage taskMessage){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println(mapper.writeValueAsString(taskMessage));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        if(_sabotageHandler.taskCompleted(taskMessage.getLobby(), taskMessage.getId())){
+            //_tasksHandler.finishTask(taskMessage.getLobby(), taskMessage.getId());
+        }else {
+            _sabotageHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
+        }
+
+        sabotageInformation(taskMessage.getLobby());
+        _messagingTemplate.convertAndSend("/topic/sabotages/" + taskMessage.getLobby() + "/currentSabotage/" + taskMessage.getPlayer(), "");
     }
 }
