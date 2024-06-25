@@ -70,7 +70,8 @@ public class SabotageController {
                 availableSabotages,
                 (_sabotageHandler.getCurrentSabotage(lobbyID) == null) ? -1 : _sabotageHandler.getCurrentSabotage(lobbyID).getId(),
                 _sabotageHandler.getTimerDuration_sec(lobbyID),
-                _sabotageHandler.getTimerCooldown_sec(lobbyID)
+                _sabotageHandler.getTimerCooldown_sec(lobbyID),
+                _sabotageHandler.getStatus(lobbyID)
         );
 
         ObjectMapper mapper = new ObjectMapper();
@@ -99,5 +100,18 @@ public class SabotageController {
                     HttpEntity<String> request = new HttpEntity<>(startSabotageMessage.getGameId(), headers);
                     ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
                 });
+    }
+
+    @MessageMapping("sabotage/startTask")
+    public void startTask(TaskMessage taskMessage){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("Task started: " + mapper.writeValueAsString(taskMessage));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        //_tasksHandler.startTask(taskMessage.getLobby(), taskMessage.getId(), taskMessage.getPlayer());
+        //stateOfTasks(taskMessage.getLobby());
+        //_messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), _tasksHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
     }
 }

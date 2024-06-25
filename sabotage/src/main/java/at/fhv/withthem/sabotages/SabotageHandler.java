@@ -3,12 +3,7 @@ package at.fhv.withthem.sabotages;
 import at.fhv.withthem.sabotages.sabotage.Reaction;
 import at.fhv.withthem.sabotages.sabotage.Task;
 import at.fhv.withthem.sabotages.sabotage.connecting_wires.TaskConnectingWires;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -16,6 +11,7 @@ import java.util.*;
 public class SabotageHandler {
     private final HashMap<String, List<Task>> _availableSabotages = new HashMap<>();
     private HashMap<String, Task> _currentSabotage = new HashMap<>();
+    private String _status = "unset";
     private final Set<String> _initializedLobbies = new HashSet<>();
 
     final private int SABOTAGE_DURATION_SEC = 60;
@@ -56,7 +52,7 @@ public class SabotageHandler {
                     break;
                 }
             }
-
+            _status = "available";
             Thread timerThread = new Thread(() -> {
                 while (_timerCooldown_sec.get(lobbyID) > 0) {
                     try {
@@ -119,5 +115,9 @@ public class SabotageHandler {
 
     public int getTimerCooldown_sec(String lobbyID){
         return _timerCooldown_sec.get(lobbyID);
+    }
+
+    public String getStatus(String lobbyID){
+        return _status;
     }
 }

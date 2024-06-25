@@ -8,15 +8,17 @@ import java.util.List;
 public class SabotageInformationMessage {
     private List<HashMap<Integer, String>> _availableSabotages;
     private int _currentSabotageID;
-    private int timer;
-    private int cooldown;
+    private int _timer;
+    private int _cooldown;
+    private String _status;
 
     @JsonCreator
-    public SabotageInformationMessage(List<HashMap<Integer, String>> availableSabotages, int currentSabotageID, int timer, int cooldown) {
+    public SabotageInformationMessage(List<HashMap<Integer, String>> availableSabotages, int currentSabotageID, int timer, int cooldown, String status) {
         _availableSabotages = availableSabotages;
         _currentSabotageID = currentSabotageID;
-        this.timer = timer;
-        this.cooldown = cooldown;
+        this._timer = timer;
+        this._cooldown = cooldown;
+        this._status = status;
     }
 
     public List<HashMap<Integer, String>> getAvailableSabotages() {
@@ -28,10 +30,14 @@ public class SabotageInformationMessage {
     }
 
     public int getTimer() {
-        return timer;
+        return _timer;
     }
 
     public int getCooldown() {
-        return cooldown;
+        return _cooldown;
+    }
+
+    public String getStatus() {
+        return _status;
     }
 }
