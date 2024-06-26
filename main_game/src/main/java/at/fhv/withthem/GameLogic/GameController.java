@@ -266,7 +266,11 @@ public class GameController {
         System.out.println("Emergency meeting ended for game: " + gameId);
         gameService.resetDeathPositions(gameId);
     }
-
+    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
+    @GetMapping("/existingPlayers/{gameId}")
+    public void drawExistingPlyers(@PathVariable String gameId) {
+        gameService.getExistingPlayers(gameId);
+    }
     @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
     @GetMapping("/requestGameState/{gameId}")
     public ResponseEntity<Map<String, Object>> sendGameState(@PathVariable String gameId) {

@@ -198,12 +198,14 @@ public class GameService {
         Colors color=_games.get(gameID).getAvailableColor();
         getPlayers(gameID).put(playerId, new Player(playerId, startPosition, color));
         messagingTemplate.convertAndSend("/topic/"+gameID+"/occupiedColors", getOccupiedColors(gameID));
+    }
+
+    public void getExistingPlayers(String gameID){
         //Draws the player on the map as soon as they enter the game
         getPlayers(gameID).forEach((id, player) -> {
             messagingTemplate.convertAndSend("/topic/" + gameID + "/position", new PlayerPosition(id, player.getPosition(), player.getColor().getHexValue(), player.isAlive(), player.getDeathPosition()));
         });
     }
-
     public String registerGame(String hostName) {
         String gameId=generateGameId();
         GameMap map=new LobbyMap();
