@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -120,6 +119,4 @@ public class TasksController {
         stateOfTasks(taskMessage.getLobby());
         _messagingTemplate.convertAndSend("/topic/tasks/" + taskMessage.getLobby() + "/currentTask/" + taskMessage.getPlayer(), "");
     }
-
-
 }

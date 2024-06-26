@@ -265,6 +265,22 @@ public class GameService {
         return taskPositions;
     }
 
+    public List<TaskPosition> getSabotagePositions(String gameId){
+        GameMap map = getMap(gameId);
+        List<TaskPosition> sabotagePositions = new ArrayList<>();
+        for(int y = 0; y < map.getHeight(); y++){
+            for(int x = 0; x < map.getWidth(); x++){
+                if(map.isTask(x, y)){
+                    TaskPosition taskPosition = new TaskPosition(x, y, map.getContent(x, y));
+                    if(taskPosition.getIsSabotage()){
+                        sabotagePositions.add(taskPosition);
+                    }
+                }
+            }
+        }
+        return sabotagePositions;
+    }
+
     public Game getGame(String gameId) {
         return _games.get(gameId);
     }

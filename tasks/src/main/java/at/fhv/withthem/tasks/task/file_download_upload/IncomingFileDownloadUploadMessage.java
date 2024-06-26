@@ -1,4 +1,4 @@
-package at.fhv.withthem.tasks.task;
+package at.fhv.withthem.tasks.task.file_download_upload;
 
 import at.fhv.withthem.tasks.TaskMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;

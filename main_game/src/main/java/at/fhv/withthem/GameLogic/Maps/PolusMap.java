@@ -93,19 +93,19 @@ public class PolusMap extends GameMap{
 
                 setMeetingPoint(44, 11);
 
-                setTask(56, 30, "Connecting Wires", 1); // Admin
-                setTask(36, 2, "Connecting Wires", 2); // Cafeteria
-                setTask(53, 45, "Connecting Wires", 3); // Communications
-                setTask(31, 28, "Connecting Wires", 4); // Electrical
-                setTask(11, 15, "Connecting Wires", 5); // Align Engine
-                setTask(10, 39, "Connecting Wires", 6); // Align Engine
-                setTask(34, 23, "Connecting Wires", 7); // MedBay
-                setTask(74, 21, "Connecting Wires", 8); // Navigation
-                setTask(78, 19, "File Download", 9); // Navigation
-                setTask(80, 19, "File Upload", 9); // Navigation
-                setTask(81, 21, "Connecting Wires", 10); // Navigation
-                setTask(57, 19, "Connecting Wires", 11); // o2
-                setTask(1, 24, "Connecting Wires", 12); // o2
+                setTask(56, 30, "Connecting Wires", 1, false); // Admin
+                setTask(36, 2, "Connecting Wires", 2, false); // Cafeteria
+                setTask(53, 45, "Connecting Wires", 3, false); // Communications
+                setTask(31, 28, "Connecting Wires", 4, true); // Electrical
+                setTask(11, 15, "Connecting Wires", 5, false); // Align Engine
+                setTask(10, 39, "Connecting Wires", 6, false); // Align Engine
+                setTask(34, 23, "Connecting Wires", 7, false); // MedBay
+                setTask(74, 21, "Connecting Wires", 8, false); // Navigation
+                setTask(78, 19, "File Download", 9, false); // Navigation
+                setTask(80, 19, "File Upload", 9, false); // Navigation
+                setTask(81, 21, "Connecting Wires", 10, false); // Navigation
+                setTask(57, 19, "Connecting Wires", 11, true); // o2
+                setTask(1, 24, "Connecting Wires", 12, false); // o2
                 // Security, Shields, Storage, Weapons are not implemented
         }
 }

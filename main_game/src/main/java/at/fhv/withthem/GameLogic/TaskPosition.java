@@ -3,12 +3,17 @@ package at.fhv.withthem.GameLogic;
 public class TaskPosition extends Position{
     private String _taskType;
     private int _id;
+    private boolean _isSabotage;
 
-    public TaskPosition(float x, float y, String taskTypeWithId) {
+    public TaskPosition(float x, float y, String taskTypeWithIdAndSabotage) {
         super(x, y);
-        String[] taskTypeAndId = taskTypeWithId.split("%id");
-        _taskType = taskTypeAndId[0];
-        _id = Integer.parseInt(taskTypeAndId[1]);
+
+        String[] taskTypeAndIdWithSabotage = taskTypeWithIdAndSabotage.split("%id=");
+        String[] idAndSabotage = taskTypeAndIdWithSabotage[1].split("%sabotage=");
+
+        _taskType = taskTypeAndIdWithSabotage[0];
+        _id = Integer.parseInt(idAndSabotage[0]);
+        _isSabotage = Boolean.parseBoolean(idAndSabotage[1]);
     }
 
     public String getTaskType() {
@@ -21,5 +26,9 @@ public class TaskPosition extends Position{
 
     public int getId() {
         return _id;
+    }
+
+    public boolean getIsSabotage() {
+        return _isSabotage;
     }
 }

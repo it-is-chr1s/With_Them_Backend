@@ -19,7 +19,8 @@
 		<module>main_game</module>
 		<module>emergency_meeting</module>
 		<module>chat</module>
-	</modules>
+        <module>sabotage</module>
+    </modules>
     <properties>
 		<java.version>17</java.version>
 	</properties>

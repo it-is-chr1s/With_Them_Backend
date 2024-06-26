@@ -1,8 +1,8 @@
 package at.fhv.withthem.tasks;
 
 import at.fhv.withthem.tasks.task.Reaction;
-import at.fhv.withthem.tasks.task.TaskConnectingWires;
-import at.fhv.withthem.tasks.task.TaskFileDownloadUpload;
+import at.fhv.withthem.tasks.task.connecting_wires.TaskConnectingWires;
+import at.fhv.withthem.tasks.task.file_download_upload.TaskFileDownloadUpload;
 import at.fhv.withthem.tasks.task.Task;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

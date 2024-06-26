@@ -1,18 +1,6 @@
 package at.fhv.withthem;
 
-import at.fhv.withthem.TasksApplication;
-import at.fhv.withthem.tasks.TaskMessage;
-import at.fhv.withthem.tasks.TasksHandler;
-import at.fhv.withthem.tasks.task.IncomingFileDownloadUploadMessage;
-import at.fhv.withthem.tasks.task.OutgoingFileDownloadUploadMessage;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest(classes = TasksApplication.class)
 public class TaskFileDownloadUploadApplicationTest {

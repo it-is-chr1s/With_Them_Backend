@@ -1,7 +1,9 @@
-package at.fhv.withthem.tasks;
+package at.fhv.withthem.sabotages;
 
-import at.fhv.withthem.tasks.task.connecting_wires.IncomingConnectingWiresMessage;
-import at.fhv.withthem.tasks.task.file_download_upload.IncomingFileDownloadUploadMessage;
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+
+import at.fhv.withthem.sabotages.sabotage.connecting_wires.IncomingConnectingWiresMessage;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -14,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = IncomingConnectingWiresMessage.class, name = "incomingConnectingWires"),
-        @JsonSubTypes.Type(value = IncomingFileDownloadUploadMessage.class, name = "incomingFileDownloadUpload")
 })
 public class TaskMessage {
     private String _lobby;
