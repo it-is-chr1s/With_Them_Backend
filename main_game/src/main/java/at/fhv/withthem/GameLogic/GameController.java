@@ -67,9 +67,9 @@ public class GameController {
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = {"http://localhost:5173/", "http://10.0.40.170:8080/"})
+    @CrossOrigin(origins = { "http://localhost:5173/", "http://10.0.40.170:8080/" })
     @PostMapping("/sabotageReachedTimeout/{gameId}")
-    public ResponseEntity<String> sabotageReachedTimeout(@PathVariable String gameId){
+    public ResponseEntity<String> sabotageReachedTimeout(@PathVariable String gameId) {
         gameService.gameOver(gameId, 1);
         return new ResponseEntity<>(gameId, HttpStatus.OK);
     }
@@ -313,6 +313,12 @@ public class GameController {
     public void handleMeetingEnd(@PathVariable String gameId) {
         System.out.println("Emergency meeting ended for game: " + gameId);
         gameService.resetDeathPositions(gameId);
+    }
+
+    @CrossOrigin(origins = { "http://localhost:5173/", "http://10.0.40.170:8080/" })
+    @GetMapping("/existingPlayers/{gameId}")
+    public void drawExistingPlyers(@PathVariable String gameId) {
+        gameService.getExistingPlayers(gameId);
     }
 
     @CrossOrigin(origins = { "http://localhost:5173/", "http://10.0.40.170:8080/" })

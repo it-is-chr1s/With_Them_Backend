@@ -1,5 +1,8 @@
 package at.fhv.withthem.MeetingLogic;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.core.AbstractDestinationResolvingMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -9,6 +12,11 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class EmergencyMeetingHandler {
+    private final SimpMessagingTemplate _messagingTemplate;
+    @Autowired
+    public EmergencyMeetingHandler(SimpMessagingTemplate messagingTemplate) {
+        _messagingTemplate = messagingTemplate;
+    }
     private final HashMap<String, EmergencyMeeting> _emergencyMeetings= new HashMap<>();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -52,6 +60,8 @@ public class EmergencyMeetingHandler {
             scheduler.schedule(() -> {
                 if(_emergencyMeetings.get(gameId).getVotedStarted()){
                     System.out.println("Voting ended");
+                    String suspect=getSuspect(gameId);
+                    _messagingTemplate.convertAndSend("/topic/meeting/" + gameId + "/suspect", suspect);
                     _emergencyMeetings.get(gameId).endVoting();
                 }
             }, 45, TimeUnit.SECONDS);
