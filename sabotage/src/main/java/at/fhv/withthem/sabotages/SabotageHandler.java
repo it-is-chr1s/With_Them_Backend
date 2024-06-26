@@ -3,7 +3,12 @@ package at.fhv.withthem.sabotages;
 import at.fhv.withthem.sabotages.sabotage.Reaction;
 import at.fhv.withthem.sabotages.sabotage.Task;
 import at.fhv.withthem.sabotages.sabotage.connecting_wires.TaskConnectingWires;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -57,29 +62,35 @@ public class SabotageHandler {
             _status.replace(lobbyID, "available");
             Thread timerThread = new Thread(() -> {
                 while (_timerCooldown_sec.get(lobbyID) != null && _timerCooldown_sec.get(lobbyID) > 0) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        break;  // Exit the loop if the thread is interrupted
-                    }
 
-                    _timerCooldown_sec.replace(lobbyID, _timerCooldown_sec.get(lobbyID) - 1);
+                    _timerCooldown_sec.replace(lobbyID, _timerCooldown_sec.get(lobbyID) - 5);
                     if (_timerDuration_sec.get(lobbyID) > 0) {
-                        _timerDuration_sec.replace(lobbyID, _timerDuration_sec.get(lobbyID) - 1);
+                        _timerDuration_sec.replace(lobbyID, _timerDuration_sec.get(lobbyID) - 5);
                     }
 
                     updateInformation.react();
-
+/*
                     System.out.println("Sabotage timer: " + _timerDuration_sec.get(lobbyID) + "s");
                     System.out.println("Sabotage cooldown: " + _timerCooldown_sec.get(lobbyID) + "s");
-
+*/
                     if(_timerDuration_sec.get(lobbyID) == 0 && _currentSabotage.get(lobbyID) != null){
                         cleanLobby(lobbyID);
                         reachedTimeout.react();
                     }
+
+                    if(_timerCooldown_sec.get(lobbyID) != 0) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;  // Exit the loop if the thread is interrupted
+                        }
+                    }
                 }
-                System.out.println("Sabotage cooldown reached.");
+                _timerDuration_sec.replace(lobbyID, SABOTAGE_DURATION_SEC);
+                _timerCooldown_sec.replace(lobbyID, SABOTAGE_COOLDOWN_SEC);
+                updateInformation.react();
+                //System.out.println("Sabotage cooldown reached.");
             });
             timerThread.start();
         }
@@ -97,6 +108,7 @@ public class SabotageHandler {
         if(sabotageId == _currentSabotage.get(lobbyID).getId()){
             _currentSabotage.get(lobbyID).setPlayer(player);
             _status.replace(lobbyID, "active");
+            System.out.println("Sabotage set status active and set player:" + player);
         }
     }
 
@@ -123,6 +135,21 @@ public class SabotageHandler {
 
     public void cancelTask(String lobby, int id){
         _status.replace(lobby, "available");
+    }
+
+    public void playerAction(TaskMessage taskMessage, Reaction reaction) {
+        if(_currentSabotage.get(taskMessage.getLobby()).getPlayer().equals(taskMessage.getPlayer())){
+            _currentSabotage.get(taskMessage.getLobby()).playerAction(taskMessage, reaction);
+        }
+    }
+
+    public void finishTask(String lobby, int id){
+        if(_currentSabotage.get(lobby).getId() == id){
+            System.out.println("Fixed sabotage: " + id);
+            _currentSabotage.get(lobby).reset();
+            _currentSabotage.remove(lobby);
+            _status.replace(lobby, "unset");
+        }
     }
 
     public List<TaskMessage> getAvailableSabotages(String lobby){

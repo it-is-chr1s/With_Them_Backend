@@ -54,7 +54,7 @@ public class SabotageController {
 
     @MessageMapping("sabotages/requestInformation")
     public void sabotageInformation(@Payload String lobbyID) {
-        System.out.println("requestSabotageInformation for " + lobbyID);
+        //System.out.println("requestSabotageInformation for " + lobbyID);
 
         if(!_sabotageHandler.lobbyExists(lobbyID)){
             System.out.println("Lobby " + lobbyID + " does not exist");
@@ -75,11 +75,11 @@ public class SabotageController {
         );
 
         ObjectMapper mapper = new ObjectMapper();
-        try {
-            System.out.println(mapper.writeValueAsString(message));
+        /*try {
+            //System.out.println(mapper.writeValueAsString(message));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
         _messagingTemplate.convertAndSend("/topic/sabotages/" + lobbyID + "/information", message);
     }
@@ -115,6 +115,21 @@ public class SabotageController {
         _messagingTemplate.convertAndSend("/topic/sabotages/" + taskMessage.getLobby() + "/currentSabotage/" + taskMessage.getPlayer(), _sabotageHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
     }
 
+    @MessageMapping("tasks/playerAction")
+    public void playerAction(TaskMessage taskMessage){
+        System.out.println("called player action.");
+        _sabotageHandler.playerAction(taskMessage, () -> {
+            System.out.println("answer");
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                System.out.println(mapper.writeValueAsString(_sabotageHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer())));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+            _messagingTemplate.convertAndSend("/topic/sabotages/" + taskMessage.getLobby() + "/currentSabotage/" + taskMessage.getPlayer(), _sabotageHandler.getCurrentState(taskMessage.getLobby(), taskMessage.getPlayer()));
+        });
+    }
+
     @MessageMapping("sabotages/closeSabotage")
     public void cancelTask(TaskMessage taskMessage){
         ObjectMapper mapper = new ObjectMapper();
@@ -124,7 +139,7 @@ public class SabotageController {
             throw new RuntimeException(e);
         }
         if(_sabotageHandler.taskCompleted(taskMessage.getLobby(), taskMessage.getId())){
-            //_tasksHandler.finishTask(taskMessage.getLobby(), taskMessage.getId());
+            _sabotageHandler.finishTask(taskMessage.getLobby(), taskMessage.getId());
         }else {
             _sabotageHandler.cancelTask(taskMessage.getLobby(), taskMessage.getId());
         }
